@@ -1,0 +1,14 @@
+: 1
+name: hostie-cli
+version: 0.1.0
+language: c++
+summary: hostie-cli C++ executable
+license: other: proprietary ; Not free/open source.
+description-file: README.md
+url: https://example.org/hostie-cli
+email: michael@planed.es
+depends: * build2 >= 0.16.0
+depends: * bpkg >= 0.16.0
+depends: { libcrails-logger libcrails-cli libcrails-random libcrails-readfile libcrails-database-url } ^2.0.0
+depends: libboost-program-options >= 1.78.0
+depends: crails-backup ^1.0.0

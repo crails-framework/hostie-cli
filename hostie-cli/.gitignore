@@ -1,0 +1,5 @@
+hostie-cli
+
+# Testscript output directory (can be symlink).
+#
+test-hostie-cli
