@@ -44,9 +44,9 @@ int CreateCommand::run()
   service.environment_path = environment.get_path();
   database.user = user.name;
   database.database_name = service.app_name;
-  database.password = Crails::generate_random_string("abcdefghijklmnopqrstuvwxyz"
-                                                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                                     "0123456789-_", 12);
+  database.password = Crails::generate_random_string(
+    PostgresDatabase::password_charset, 12
+  );
 
   vector<string> link_paths{
     "$LD_LIBRARY_PATH",

@@ -10,6 +10,8 @@ struct MysqlDatabase
   std::string hostname = "127.0.0.1";
   unsigned short port = 3306;
 
+  static const std::string password_charset;
+
   void from_url(const Crails::DatabaseUrl&);
   Crails::DatabaseUrl get_url() const;
 

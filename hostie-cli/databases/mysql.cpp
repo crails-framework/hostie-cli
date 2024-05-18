@@ -7,6 +7,10 @@
 
 using namespace std;
 
+const string MysqlDatabase::password_charset = "abcdefghijklmnopqrstuvwxyz"
+                                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                               "0123456789-_";
+
 void MysqlDatabase::from_url(const Crails::DatabaseUrl& url)
 {
   user = url.username;

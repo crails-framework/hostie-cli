@@ -29,9 +29,9 @@ int CreateCommand::run()
     user.group = options["group"].as<string>();
     database.user = user.name;
     database.database_name = options["name"].as<string>();
-    database.password = Crails::generate_random_string("abcdefghijklmnopqrstuvwxyz"
-                                                       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                                       "0123456789-_", 12);
+    database.password = Crails::generate_random_string(
+      MysqlDatabase::password_charset, 12
+    );
 
     if (!prepare_runtime_directory(user))
       return cancel(user, database);
