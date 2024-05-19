@@ -16,5 +16,7 @@ role: prerequisite
 location: https://github.com/crails-framework/libcrails-database-url.git#master
 :
 role: prerequisite
+location: https://github.com/crails-framework/libcrails-random.git#master
+:
+role: prerequisite
 location: https://github.com/crails-framework/crails-backup.git#master
-
