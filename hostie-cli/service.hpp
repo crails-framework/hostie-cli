@@ -6,6 +6,7 @@ struct SystemService
 {
   std::string app_name, app_user, app_group;
   std::string start_command, stop_command;
+  std::string kill_mode;
   std::filesystem::path runtime_directory;
   std::filesystem::path environment_path;
 

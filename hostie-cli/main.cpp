@@ -7,6 +7,7 @@
 #include <crails/cli/process.hpp>
 #include "crailscms/index.hpp"
 #include "wordpress/index.hpp"
+#include "odoo/index.hpp"
 
 using namespace std;
 
@@ -31,8 +32,8 @@ int main(int argc, const char** argv)
 
   index.add_command("crailscms", []() { return std::make_shared<CrailsCmsIndex>(); });
   index.add_command("wordpress", []() { return std::make_shared<WordpressIndex>(); });
+  index.add_command("odoo",      []() { return std::make_shared<OdooIndex>(); });
   //index.add_command("nextcloud", []() { return nullptr; });
-  //index.add_command("odoo",      []() { return nullptr; });
   index.initialize(argc, argv);
   return index.run();
 }

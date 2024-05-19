@@ -112,8 +112,10 @@ std::string SystemService::service_file_contents() const
   stream << "ExecStart=" << start_command << '\n';
   if (stop_command.length() > 0)
     stream << "ExecStop=" << stop_command << '\n';
+  if (kill_mode.length() > 0)
+    stream << "KillMode=" << kill_mode << '\n';
   stream
-    << "PIDFile=/tmp/crails-cms-" << app_name << ".pid\n"
+    << "PIDFile=/tmp/hostie-" << app_name << ".pid\n"
     << "Restart=always\n\n"
     << "[Install]\n"
     << "WantedBy=multi-user.target";

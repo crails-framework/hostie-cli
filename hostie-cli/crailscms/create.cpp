@@ -2,8 +2,6 @@
 #include <crails/utils/random_string.hpp>
 #include <crails/utils/join.hpp>
 #include <crails/read_file.hpp>
-#include <filesystem>
-#include <fstream>
 #include <sstream>
 #include <cstdlib>
 #include <iostream>
@@ -11,7 +9,6 @@
 #include "../service.hpp"
 #include "../user.hpp"
 #include "../databases/postgres.hpp"
-#include <iostream>
 
 using namespace std;
 using namespace CrailsCms;
@@ -112,102 +109,9 @@ bool CreateCommand::migrate_database(const SystemService& service)
   return true;
 }
 
-bool CreateCommand::prepare_environment_file()
-{
-  if (options.count("env"))
-  {
-    for (const string& param : options["env"].as<vector<string>>())
-    {
-      string contents;
-
-      if (param.find('=') != string::npos)
-        contents = param;
-      else if (!Crails::read_file(param, contents))
-        cerr << "could not read environment file " << param << endl;
-      environment.append(contents);
-    }
-  }
-  return environment.save();
-}
-
-bool CreateCommand::prepare_runtime_directory(const InstanceUser& user)
-{
-  if (options.count("runtime-directory"))
-    var_directory = filesystem::weakly_canonical(options["runtime-directory"].as<string>());
-  else if (std::getenv("VAR_DIRECTORY") != 0)
-    var_directory = filesystem::weakly_canonical(getenv("VAR_DIRECTORY")) / options["name"].as<string>();
-  else
-  {
-    cerr << "could not deduce runtime directory" << endl;
-    return false;
-  }
-
-  if (filesystem::is_directory(var_directory) || filesystem::create_directories(var_directory))
-    cerr << "using runtime directory: " << var_directory << endl;
-  else
-  {
-    cerr << "could not create runtime directory " << var_directory << endl;
-    return false;
-  }
-
-  state += VarDirectoryCreated;
-
-  stringstream chown_command, chgrp_command;
-  chown_command << "chown -R " << user.name  << ' ' << var_directory;
-  chgrp_command << "chown -R " << user.group << ' ' << var_directory;
-  cout << "+ " << chown_command.str() << " && " << chgrp_command.str() << endl;
-  return system(chown_command.str().c_str()) == 0 && system(chgrp_command.str().c_str()) == 0;
-}
-
-filesystem::path CreateCommand::get_log_directory() const
-{
-  return filesystem::path("/var/log") / environment.get_project_name();
-}
-
-bool CreateCommand::prepare_log_directory(const SystemService& service)
-{
-  filesystem::path directory = get_log_directory();
-
-  if (filesystem::is_directory(directory) || filesystem::create_directories(directory))
-  {
-    string chown_command = "chown " + service.app_user + ' ' + directory.string();
-
-    cerr << "using log directory: " << directory << endl;
-    if (std::system(chown_command.c_str()) != 0)
-    {
-      cerr << "could not chown log directory " << directory << endl;
-      return false;
-    }
-  }
-  else
-  {
-    cerr << "could not create log directory " << directory << endl;
-    return false;
-  }
-  state += LogDirectoryCreated;
-  return true;
-}
-
-bool CreateCommand::create_user(InstanceUser& user)
-{
-  if (user.require())
-  {
-    state += UserCreated;
-    return true;
-  }
-  return false;
-}
-
 int CreateCommand::cancel(InstanceUser& user, PostgresDatabase& database)
 {
-  filesystem::remove(environment.get_path());
-  if ((state & VarDirectoryCreated) > 0)
-    filesystem::remove_all(var_directory);
-  if ((state & LogDirectoryCreated) > 0)
-    filesystem::remove_all(get_log_directory());
   if ((state & DatabaseCreated) > 0)
     database.drop_database();
-  if ((state & UserCreated) > 0)
-    user.delete_user();
-  return -1;
+  return StandardCreator::cancel(user);
 }

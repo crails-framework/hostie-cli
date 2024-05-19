@@ -1,8 +1,11 @@
 #include "live_instance_command.hpp"
-#include <sstream>
 #include <cstdlib>
+#include <filesystem>
+#include <sstream>
 
 using namespace std;
+
+filesystem::path crails_backup_bin();
   
 bool LiveInstanceCommand::initialize(int argc, const char** argv)
 {
@@ -27,7 +30,7 @@ bool LiveInstanceCommand::wipe_backups()
   ostringstream command;
 
   command
-   << "/usr/local/bin/crails-backup wipe -n "
+   << crails_backup_bin() << " wipe -n "
    << quoted(environment.get_project_name());
   cerr << "+ " << command.str() << endl;
   return system(command.str().c_str()) == 0;
