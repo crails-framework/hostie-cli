@@ -2,7 +2,6 @@
 #include <crails/read_file.hpp>
 #include <filesystem>
 #include <iostream>
-#include <crails/logger.hpp>
 #include <crails/cli/command_index.hpp>
 #include <crails/cli/process.hpp>
 #include "crailscms/index.hpp"
