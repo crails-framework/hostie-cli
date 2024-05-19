@@ -5,21 +5,35 @@
 
 using namespace std;
 
+static string get_uname()
+{
+  string result;
+
+  Crails::run_command("uname", result);
+  return result;
+}
+
+static pair<string,string> get_lsb()
+{
+  pair<string,string> result;
+
+  Crails::run_command("lsb_release -i", result.first);
+  Crails::run_command("lsb_release -r", result.second);
+  return result;
+}
+
 char WizardBase::system_matches(const string_view distribution, const string_view version)
 {
-  string uname;
+  static const string uname = get_uname();
 
-  Crails::run_command("uname", uname);
   if (uname.find("Linux") != string::npos)
   {
     if (Crails::require_command("lsb_release"))
     {
-      string distributor_id, release;
+      static const pair<string,string> lsb = get_lsb();
 
-      Crails::run_command("lsb_release -i", distributor_id);
-      Crails::run_command("lsb_release -r", release);
-      if (string_view(distributor_id).find(distribution) != string_view::npos)
-        return string_view(release).find(version) != string_view::npos ? 2 : 1;
+      if (string_view(lsb.first).find(distribution) != string_view::npos)
+        return string_view(lsb.second).find(version) != string_view::npos ? 2 : 1;
     }
   }
   else if (uname.find("FreeBSD") != string::npos)
