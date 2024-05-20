@@ -31,13 +31,17 @@ bool Wizard::download_wordpress()
       filesystem::create_directories(target.parent_path());
     else
       filesystem::remove_all(target);
-    filesystem::rename("wordpress", target);
-    if (Crails::write_file("wordpress-installer", (target / "wp-config.php").string(), wp_config_src))
+    if (Crails::move_file("wordpress", target))
     {
-      store.variable("wordpress_src", target.string());
-      store.save();
-      return true;
+      if (Crails::write_file("wordpress-installer", (target / "wp-config.php").string(), wp_config_src))
+      {
+        store.variable("wordpress_src", target.string());
+        store.save();
+        return true;
+      }
     }
+    else
+      cerr << "Failed to move wordpress to " << target << endl;
   }
   return false;
 }

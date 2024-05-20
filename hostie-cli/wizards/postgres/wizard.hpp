@@ -20,7 +20,7 @@ public:
     {
       password = Crails::generate_random_string(PostgresDatabase::password_charset, 12);
       store.variable("postgres_root", password);
-      if (alter_postgres_user())
+      if (start_service() && alter_postgres_user())
       {
         store.save();
         return 0;
@@ -30,6 +30,8 @@ public:
     }
     return -1;
   }
+
+  virtual bool start_service() = 0;
 
   bool alter_postgres_user()
   {

@@ -10,6 +10,7 @@ static string get_uname()
   string result;
 
   Crails::run_command("uname", result);
+  cout << "Detected system: " << result;
   return result;
 }
 
@@ -19,6 +20,8 @@ static pair<string,string> get_lsb()
 
   Crails::run_command("lsb_release -i", result.first);
   Crails::run_command("lsb_release -r", result.second);
+  cout << "Detected distribution: " << result.first;
+  cout << "Detected release: " << result.second;
   return result;
 }
 
