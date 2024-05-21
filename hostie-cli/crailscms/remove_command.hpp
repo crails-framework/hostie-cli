@@ -3,6 +3,7 @@
 #include "../databases/postgres.hpp"
 #include "../user.hpp"
 #include "../service.hpp"
+#include "../nginx/remove_command.hpp"
 #include <iostream>
 #include <filesystem>
 
@@ -45,6 +46,10 @@ namespace CrailsCms
         cerr << "removing user" << endl;
         if (!user.delete_user())
           return -1;
+        cerr << "removing nginx site" << endl;
+        if (Nginx::remove_site(service.app_name))
+          return -1;
+        cerr << "wiping backups" << endl;
         wipe_backups();
         return 0;
       }

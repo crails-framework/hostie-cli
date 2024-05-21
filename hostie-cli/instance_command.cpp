@@ -4,7 +4,7 @@
 #include <iostream>
 
 using namespace std;
-  
+
 bool InstanceCommand::initialize(int argc, const char** argv)
 {
   if (Crails::Command::initialize(argc, argv))
