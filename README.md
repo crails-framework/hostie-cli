@@ -13,6 +13,18 @@ Supports the following web applications:
 crails-backup uses the [build2](https://www.build2.org/) build system, and you
 may use this git repository as a build2 package.
 
+Assuming you have installed build2's bpkg tool, as well as boost's development
+files, you may build this project from source using the following commands:
+
+```sh
+BUILD_DIR=build-hostie
+bpkg create -d $BUILD_DIR cc config.cxx=g++ config.bin.rpath=/usr/local/lib config.install.root=/usr/local config.install.sudo=sudo
+cd $BUILD_DIR
+bpkg add --type git "https://github.com/crails-framework/hostie-cli.git#master"
+bpkg fetch
+bpkg build hostie-cli '?sys:libboost-program-options/*' '?sys:libboost-date-time/*' '?sys:libboost-process/*' '?sys:libboost-asio/*'
+```
+
 ## How to use
 
 The hostie-cli command supports various web applications that you may host on
