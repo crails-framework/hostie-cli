@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cstdlib>
 #include "mysql.hpp"
+#include "../hostie_variables.hpp"
 
 using namespace std;
 
@@ -37,8 +38,8 @@ string MysqlDatabase::sql_query_command(const string_view query) const
 {
   stringstream command, su_command;
 
-  const string mysql_username = "cmsfarm";
-  const string mysql_password = "secure_password";
+  const string mysql_username = "root";
+  const string mysql_password = HostieVariables::global->variable("mysql_root");
 
   setenv("MYSQL_PWD", mysql_password.c_str(), 1);
   cout << "sql query: " << query << endl;

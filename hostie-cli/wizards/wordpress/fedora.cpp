@@ -8,6 +8,7 @@ using namespace Wordpress::Fedora;
 int Wizard::run()
 {
   requirements = {
+    "php",
     "php-fpm",
     "php-mysqlnd",
     "php-common",

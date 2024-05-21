@@ -11,6 +11,7 @@
 #include "../user.hpp"
 #include "../databases/mysql.hpp"
 #include "../file_ownership.hpp"
+#include "../hostie_variables.hpp"
 #include "php.hpp"
 
 using namespace std;
@@ -108,6 +109,8 @@ filesystem::path CreateCommand::find_wordpress_source() const
     return filesystem::weakly_canonical(options["wordpress-source"].as<string>());
   else if (std::getenv("WORDPRESS_DIRECTORY") != 0)
     return filesystem::weakly_canonical(getenv("WORDPRESS_DIRECTORY"));
+  else if (HostieVariables::global->has_variable("wordpress-source"))
+    return filesystem::weakly_canonical(HostieVariables::global->variable("wordpress-source"));
   cerr << "could not deduce wordpress directory" << endl;
   return filesystem::path();
 }
@@ -210,7 +213,8 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
 
 bool CreateCommand::generate_fpm_pool(const InstanceUser& user)
 {
-  ofstream stream(fpm_pool_path(environment));
+  filesystem::path fpm_conf_path = fpm_pool_path(environment);
+  ofstream stream(fpm_conf_path);
 
   if (stream.is_open())
   {
@@ -223,8 +227,10 @@ bool CreateCommand::generate_fpm_pool(const InstanceUser& user)
     state += FpmPoolCreated;
     return true;
   }
+  else if (fpm_conf_path.empty())
+    cerr << "failed to deduce php-fpm conf directory" << endl;
   else
-    cerr << "failed to create php fpm pool at " << fpm_pool_path(environment) << endl;
+    cerr << "failed to create php fpm pool at " << fpm_conf_path << endl;
   return false;
 }
 

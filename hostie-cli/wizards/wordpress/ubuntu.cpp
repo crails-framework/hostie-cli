@@ -8,6 +8,7 @@ using namespace Wordpress::Ubuntu;
 int Wizard::run()
 {
   requirements = {
+    "php",
     "php-fpm",
     "php-mysql",
     "php-curl",

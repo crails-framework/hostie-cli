@@ -19,6 +19,17 @@ namespace Wordpress
 
   filesystem::path fpm_pool_path(const InstanceEnvironment& environment)
   {
-    return filesystem::path("/etc/php") / php_version() / (environment.get_project_name() + ".conf");
+    vector<filesystem::path> candidates{
+      filesystem::path("/etc/php") / php_version() / "fpm" / "pool.d",
+      filesystem::path("/etc/php-fpm.d")
+    };
+    string filename = environment.get_project_name() + ".conf";
+
+    for (const filesystem::path& candidate : candidates)
+    {
+      if (filesystem::is_directory(candidate))
+        return candidate / filename;
+    }
+    return filesystem::path();
   }
 }

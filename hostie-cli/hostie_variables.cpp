@@ -5,6 +5,8 @@
 
 using namespace std;
 
+unique_ptr<HostieVariables> HostieVariables::global;
+
 static string store_path()
 {
   const char* from_env = getenv("HOSTIE_RC");

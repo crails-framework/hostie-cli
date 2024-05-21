@@ -9,6 +9,7 @@
 #include "odoo/index.hpp"
 #include "wizards/index.hpp"
 #include "nginx/index.hpp"
+#include "hostie_variables.hpp"
 
 using namespace std;
 
@@ -30,6 +31,7 @@ int main(int argc, const char** argv)
   Crails::CommandIndex index;
 
   crailscms_bin_dir = make_crailscms_bin_dir(argv[0]);
+  HostieVariables::global = make_unique<HostieVariables>();
 
   index.add_command("crailscms", []() { return std::make_shared<CrailsCmsIndex>(); });
   index.add_command("wordpress", []() { return std::make_shared<WordpressIndex>(); });
@@ -37,6 +39,7 @@ int main(int argc, const char** argv)
   //index.add_command("nextcloud", []() { return nullptr; });
   index.add_command("nginx", []() { return std::make_shared<Nginx::IndexCommand>(); });
   index.add_command("wizard", []() { return std::make_shared<WizardsIndex>(); });
-  index.initialize(argc, argv);
-  return index.run();
+  if (index.initialize(argc, argv))
+    return index.run();
+  return -1;
 }

@@ -35,7 +35,7 @@ bool Wizard::download_wordpress()
     {
       if (Crails::write_file("wordpress-installer", (target / "wp-config.php").string(), wp_config_src))
       {
-        store.variable("wordpress_src", target.string());
+        store.variable("wordpress-source", target.string());
         store.save();
         return true;
       }

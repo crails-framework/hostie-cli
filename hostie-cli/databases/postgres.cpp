@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cstdlib>
 #include "postgres.hpp"
+#include "../hostie_variables.hpp"
 
 using namespace std;
 
@@ -38,7 +39,7 @@ string PostgresDatabase::sql_query_command(const string_view query) const
   stringstream command, su_command;
 
   const string postgres_username = "postgres";
-  const string postgres_password = "postgres";
+  const string postgres_password = HostieVariables::global->variable("postgres_root");
 
   setenv("PGPASSWORD", postgres_password.c_str(), 1);
   cout << "sql query: " << query << endl;

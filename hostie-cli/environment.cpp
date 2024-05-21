@@ -11,9 +11,8 @@ using namespace std;
 
 filesystem::path InstanceEnvironment::get_root_path()
 {
-  HostieVariables settings;
   const char* env_root_path = std::getenv("HOSTIE_ROOT_PATH");
-  string configured_path = settings.variable("hostie-root-path");
+  string configured_path = HostieVariables::global->variable("hostie-root-path");
 
   if (env_root_path)
     return filesystem::path(env_root_path);
