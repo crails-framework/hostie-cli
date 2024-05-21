@@ -5,16 +5,21 @@
 #include <cstdlib>
 #include <iostream>
 #include "environment.hpp"
+#include "hostie_variables.hpp"
 
 using namespace std;
 
 filesystem::path InstanceEnvironment::get_root_path()
 {
-  const char* farm_path = std::getenv("CRAILSCMS_FARM_PATH");
-  
-  return filesystem::canonical(
-    farm_path ? filesystem::path(farm_path) : filesystem::current_path()
-  );
+  HostieVariables settings;
+  const char* env_root_path = std::getenv("HOSTIE_ROOT_PATH");
+  string configured_path = settings.variable("hostie-root-path");
+
+  if (env_root_path)
+    return filesystem::path(env_root_path);
+  return configured_path.length()
+    ? filesystem::path(configured_path)
+    : filesystem::current_path();
 }
 
 void InstanceEnvironment::set_project_name(const string& value)
