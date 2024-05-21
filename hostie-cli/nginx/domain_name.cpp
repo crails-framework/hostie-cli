@@ -10,6 +10,7 @@ bool DomainNameCommand::initialize(int argc, const char** argv)
 {
   if (InstanceCommand::initialize(argc, argv))
   {
+    environment.load();
     string application_type = environment.get_variable("APPLICATION_TYPE");
     auto initializer = Site::initializers.find(application_type);
 
