@@ -9,11 +9,22 @@
 #include "../service.hpp"
 #include "../user.hpp"
 #include "../databases/postgres.hpp"
+#include "../hostie_variables.hpp"
 
 using namespace std;
 using namespace CrailsCms;
 
-extern filesystem::path crailscms_bin_dir;
+bool CreateCommand::initialize(int argc, const char** argv)
+{
+  if (HostieVariables::global->has_variable("crailscms-bin-path"))
+  {
+    crailscms_bin_dir = HostieVariables::global->variable("crailscms-bin-path");
+    return StandardCreator::initialize(argc, argv);
+  }
+  else
+    cerr << "CrailsCMS not installed: missing crailscms-bin-path property from rc file." << endl;
+  return false;
+}
   
 int CreateCommand::run()
 {

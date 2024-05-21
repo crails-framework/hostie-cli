@@ -17,8 +17,6 @@
 using namespace std;
 using namespace Wordpress;
 
-extern filesystem::path crailscms_bin_dir;
- 
 int CreateCommand::run()
 {
   if (InstanceCommand::run() == 0)
