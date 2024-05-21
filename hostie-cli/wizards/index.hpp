@@ -2,6 +2,7 @@
 #include <crails/cli/command_index.hpp>
 #include "mysql/platforms.hpp"
 #include "postgres/platforms.hpp"
+#include "nginx/platforms.hpp"
 #include "wordpress/platforms.hpp"
 
 class WizardsIndex : public Crails::CommandIndex
@@ -20,6 +21,7 @@ public:
     using namespace std;
     add_command("mysql", mysql_platform_installer());
     add_command("postgresql", postgres_platform_installer());
+    add_command("nginx", nginx_platform_installer());
     add_command("wordpress", wordpress_platform_installer());
   }
 };
