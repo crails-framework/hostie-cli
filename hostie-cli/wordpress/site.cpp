@@ -14,6 +14,14 @@ namespace Wordpress
     site.locations.push_back(Location{
       "/", target, PhpFpmLocation, (strict_ssl ? SslRequired : NoSslState)
     });
+    site.locations.push_back(Location{
+      "~* \\.(js|css|png|jpg|jpeg|gif|ico|avif|webp|webm|ogg|oga|mp3|mp4)$",
+      target, DirectoryLocation, (strict_ssl ? SslRequired : NoSslState),
+      {
+        "expires max;"
+        "log_not_found off;"
+      }
+    });
     if (!strict_ssl)
     {
       site.locations.push_back(Location{

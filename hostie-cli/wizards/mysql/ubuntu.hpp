@@ -13,7 +13,11 @@ public:
 
   bool start_service() override
   {
-    return Crails::run_command("systemctl enable " + service_name) &&
-           Crails::run_command("systemctl start " + service_name);
+    return Crails::run_command("systemctl start " + service_name);
+  }
+
+  bool enable_service() override
+  {
+    return Crails::run_command("systemctl enable " + service_name);
   }
 };

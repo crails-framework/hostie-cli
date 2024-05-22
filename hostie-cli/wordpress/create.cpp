@@ -1,6 +1,7 @@
 #include <crails/cli/process.hpp>
 #include <crails/utils/random_string.hpp>
 #include <crails/utils/join.hpp>
+#include <crails/utils/split.hpp>
 #include <crails/read_file.hpp>
 #include <filesystem>
 #include <fstream>
@@ -43,9 +44,9 @@ int CreateCommand::run()
       {"DATABASE_URL",         database.get_url().to_string()}
     });
 
-    if (environment.save() &&
-        generate_wp_config(user, database) &&
+    if (generate_wp_config(user, database) &&
         generate_fpm_pool(user) &&
+        environment.save() &&
         create_user(user) &&
         database.prepare_user() &&
         database.prepare_database())
@@ -198,7 +199,7 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
       << "require_once(ABSPATH . 'wp-settings.php');\n";
     stream.close();
     Crails::chown(path, user.name);
-    Crails::chgrp(path, "www-data");
+    Crails::chgrp(path, HostieVariables::global->variable("web-group"));
     filesystem::permissions(path,
       filesystem::perms::owner_read | filesystem::perms::group_read |
       filesystem::perms::owner_exec | filesystem::perms::group_exec,
@@ -209,18 +210,54 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
   return false;
 }
 
+filesystem::path CreateCommand::find_php_fpm_socket_path(const filesystem::path& fpm_conf_path)
+{
+  filesystem::path conf = fpm_conf_path.parent_path() / "www.conf";
+  filesystem::path result;
+  string source;
+  
+  // Scanning www.conf to use a modified version of the default socket path
+  if (Crails::read_file(conf, source))
+  {
+    auto parts = Crails::split<string_view, vector<string_view>>(string_view(source), '\n');
+    auto it = find_if(parts.begin(), parts.end(), [](const string_view line) -> bool
+    {
+      return line.find("listen = ") == 0;
+    });
+
+    if (it != parts.end())
+    {
+      result = it->substr(9);
+      result = result.replace_filename(
+        result.stem().string() + '-' + environment.get_project_name() + result.extension().string()
+      );
+    }
+  }
+  // Falling back to a debian-compatible approach
+  if (result.empty())
+    result = "/run/php/php" + php_version() + "-fpm-" + environment.get_project_name() + ".sock";
+  environment.set_variable("PHP_FPM_SOCKET", result.string());
+  return result;
+}
+
 bool CreateCommand::generate_fpm_pool(const InstanceUser& user)
 {
   filesystem::path fpm_conf_path = fpm_pool_path(environment);
   ofstream stream(fpm_conf_path);
+
 
   if (stream.is_open())
   {
     stream
       << '[' << environment.get_project_name() << ']' << '\n'
       << "user = " << user.name << '\n'
-      << "group = www-data\n"
-      << "listen = /run/php/php" << php_version() << "-fpm.sock\n";
+      << "group = " << HostieVariables::global->variable("web-group") << '\n'
+      << "listen = " << find_php_fpm_socket_path(fpm_conf_path).string() << '\n'
+      << "listen.owner = " << HostieVariables::global->variable("web-user")<< '\n'
+      << "listen.group = " << HostieVariables::global->variable("web-group") << '\n'
+      << "chdir = " << var_directory.string() << '\n'
+      << "pm = ondemand\n"
+      << "pm.max_children = 4\n";
     stream.close();
     state += FpmPoolCreated;
     return true;

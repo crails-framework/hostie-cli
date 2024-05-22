@@ -6,6 +6,8 @@ using namespace Nginx::Fedora;
 
 int Wizard::run()
 {
+  store.variable("web-user", "nginx");
+  store.variable("web-group", "www-data");
   requirements.push_back("nginx");
   requirements.push_back("certbot");
   if (install_requirements() && start_service())

@@ -26,8 +26,7 @@ namespace Wordpress
       user.name = environment.get_variable("APPLICATION_USER");
       database_url = environment.get_variable("DATABASE_URL");
       cerr << "removing nginx site" << endl;
-      if (Nginx::remove_site(options["name"].as<string>()))
-        return -1;
+      Nginx::remove_site(options["name"].as<string>());
       cerr << "loading database from url " << database_url << endl;
       database.from_url(string_view(database_url));
       cerr << "dropping database" << endl;

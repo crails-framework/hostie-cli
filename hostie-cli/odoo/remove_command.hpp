@@ -31,8 +31,7 @@ namespace Odoo
       if (!service.running() || service.stop())
       {
         cerr << "removing nginx site" << endl;
-        if (Nginx::remove_site(service.app_name))
-          return -1;
+        Nginx::remove_site(service.app_name);
         cerr << "loading database from url " << database_url << endl;
         database.from_url(string_view(database_url));
         cerr << "dropping database" << endl;

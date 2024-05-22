@@ -57,7 +57,7 @@ string ConfigureSite::location_phpfpm_pass(const Location& location, bool ssl)
   << ind(2) "try_files $uri $uri/ /index.php$is_args$args;" << endl
   << ind(1) '}' << endl << endl
   << ind(1) "location ~ \\.php$ {" << endl
-  << ind(2) "fastcgi_pass unix:/run/php/php" << php_version() << "-fpm.sock;" << endl
+  << ind(2) "fastcgi_pass unix:" << environment.get_variable("PHP_FPM_SOCKET") <<';' << endl
   << ind(2) "fastcgi_index index.php;" << endl
   << ind(2) "fastcgi_param App-Root " << location.target << ';' << endl
   << ind(2) "fastcgi_param ABSPATH " << location.target << ';' << endl

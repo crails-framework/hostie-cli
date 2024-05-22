@@ -6,6 +6,8 @@ using namespace Nginx::Ubuntu;
 
 int Wizard::run()
 {
+  store.variable("web-user", "www-data");
+  store.variable("web-group", "www-data");
   requirements.push_back("nginx");
   requirements.push_back("certbot");
   if (install_requirements() && start_service())

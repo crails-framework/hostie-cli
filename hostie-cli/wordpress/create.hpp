@@ -44,6 +44,7 @@ namespace Wordpress
     bool generate_fpm_pool(const InstanceUser&);
     bool create_user(InstanceUser&);
 
+    std::filesystem::path find_php_fpm_socket_path(const std::filesystem::path& conf_path);
     std::filesystem::path find_wordpress_source() const;
     int cancel(InstanceUser&, MysqlDatabase&);
   };

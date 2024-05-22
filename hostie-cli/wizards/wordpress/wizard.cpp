@@ -21,6 +21,15 @@ static filesystem::path find_wordpress_source()
 static const string wp_config_src = 
   "<?php require_once($_SERVER[\"App-Root\"] . \"/wp-config.php\"); ?>";
 
+bool Wizard::apply_phpfpm_permissions(const filesystem::path& target)
+{
+  return Crails::run_command("chgrp -R " + store.variable("web-group") + " \"" + target.string() + '"')
+      && Crails::run_command("chown -R " + store.variable("web-user")  + " \"" + target.string() + '"')
+      && Crails::run_command("chmod -R o-rwx \"" + target.string() + '"')
+      && std::system(("chmod ug+x \"" + target.string() + "\"/**/*.php").c_str()) == 0
+      && std::system(("chmod ug+x \"" + target.string() + "\"/*.php").c_str()) == 0;
+}
+
 bool Wizard::download_wordpress()
 {
   if (download_tar_archive("https://wordpress.org/latest.tar.gz"))
@@ -37,8 +46,13 @@ bool Wizard::download_wordpress()
       {
         store.variable("wordpress-source", target.string());
         store.save();
-        return true;
+        if (apply_phpfpm_permissions(target))
+          return true;
+        else
+          cerr << "Failed to apply proper permissions on " << target << endl;
       }
+      else
+        cerr << "Failed to overwrite wp-config.php" << endl;
     }
     else
       cerr << "Failed to move wordpress to " << target << endl;

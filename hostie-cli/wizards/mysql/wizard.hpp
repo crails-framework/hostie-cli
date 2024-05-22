@@ -10,6 +10,7 @@ class MysqlWizard : public WIZARD_BASE
   typedef WIZARD_BASE Super;
   HostieVariables store;
   std::string password;
+  bool mysql_password_required = false;
 protected:
   std::string service_name;
 public:
@@ -22,7 +23,7 @@ public:
     {
       password = Crails::generate_random_string(MysqlDatabase::password_charset, 12);
       store.variable("mysql_root", password);
-      if (start_service() && create_mysql_user() && grant_privileges())
+      if (start_service() && create_mysql_user() && grant_privileges() && enable_service())
       {
         store.save();
         return 0;
@@ -34,6 +35,7 @@ public:
   }
 
   virtual bool start_service() = 0;
+  virtual bool enable_service() = 0;
 
   bool create_mysql_user()
   {
@@ -52,6 +54,7 @@ public:
 
   bool grant_privileges()
   {
+    mysql_password_required = true;
     return run_sql_query("GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;");
   }
 
@@ -60,7 +63,9 @@ public:
     using namespace std;
     ostringstream command;
 
-    command << "mysql -e " << quoted(query);
-    return Crails::run_command(command.str());
+    if (mysql_password_required)
+      command << "MYSQL_PWD=" << quoted(password) << ' ';
+    command << "mysql -u root -e " << quoted(query);
+    return std::system(command.str().c_str()) == 0;
   }
 };

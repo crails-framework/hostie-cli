@@ -26,6 +26,7 @@ int Wizard::run()
     {
       if (download_wordpress())
       {
+        Crails::run_command("systemctl enable php-fpm") && Crails::run_command("systemctl start php-fpm");
         return 0;
       }
     }
