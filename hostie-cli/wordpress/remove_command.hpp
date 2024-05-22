@@ -25,6 +25,9 @@ namespace Wordpress
 
       user.name = environment.get_variable("APPLICATION_USER");
       database_url = environment.get_variable("DATABASE_URL");
+      cerr << "removing nginx site" << endl;
+      if (Nginx::remove_site(options["name"].as<string>()))
+        return -1;
       cerr << "loading database from url " << database_url << endl;
       database.from_url(string_view(database_url));
       cerr << "dropping database" << endl;
@@ -40,9 +43,6 @@ namespace Wordpress
         return -1;
       cerr << "removing php-fpm pool" << endl;
       if (!filesystem::remove(fpm_pool_path()))
-        return -1;
-      cerr << "removing nginx site" << endl;
-      if (Nginx::remove_site(options["name"].as<string>()))
         return -1;
       cerr << "wiping backups" << endl;
       wipe_backups();

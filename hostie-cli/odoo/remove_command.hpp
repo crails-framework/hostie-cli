@@ -30,6 +30,9 @@ namespace Odoo
       database_url = environment.get_variable("DATABASE_URL");
       if (!service.running() || service.stop())
       {
+        cerr << "removing nginx site" << endl;
+        if (Nginx::remove_site(service.app_name))
+          return -1;
         cerr << "loading database from url " << database_url << endl;
         database.from_url(string_view(database_url));
         cerr << "dropping database" << endl;
@@ -45,9 +48,6 @@ namespace Odoo
           return -1;
         cerr << "removing user" << endl;
         if (!user.delete_user())
-          return -1;
-        cerr << "removing nginx site" << endl;
-        if (Nginx::remove_site(service.app_name))
           return -1;
         cerr << "wiping backups" << endl;
         wipe_backups();
