@@ -42,7 +42,7 @@ string ConfigureSite::location_directory_pass(const Location& location, bool ssl
 {
   ostringstream stream;
   stream
-  << "location " << location.path << " {"
+  << ind(1) "location " << location.path << " {"
   << ind(2) "root " << location.target << ';' << endl
   << location_custom_settings(location)
   << ind(1) "}" << endl;
@@ -53,7 +53,7 @@ string ConfigureSite::location_phpfpm_pass(const Location& location, bool ssl)
 {
   ostringstream stream;
   stream
-  << "location " << location.path << " {"
+  << ind(1) "location " << location.path << " {" << endl
   << ind(2) "try_files $uri $uri/ /index.php$is_args$args;" << endl
   << ind(1) '}' << endl << endl
   << ind(1) "location ~ \\.php$ {" << endl
@@ -61,7 +61,7 @@ string ConfigureSite::location_phpfpm_pass(const Location& location, bool ssl)
   << ind(2) "fastcgi_index index.php;" << endl
   << ind(2) "fastcgi_param App-Root " << location.target << ';' << endl
   << ind(2) "fastcgi_param ABSPATH " << location.target << ';' << endl
-  << ind(2) "include fastcgi.conf;"
+  << ind(2) "include fastcgi.conf;" << endl
   << location_custom_settings(location)
   << ind(1) '}' << endl;
   return stream.str();
@@ -71,7 +71,7 @@ string ConfigureSite::location_proxy_pass(const Location& location, bool ssl)
 {
   ostringstream stream;
   stream
-  << ind(1) "location " << location.path << " {"
+  << ind(1) "location " << location.path << " {" << endl
   << ind(2) "proxy_pass http://" << location.target << ';' << endl
   << ind(2) "proxy_set_header Host              $host;" << endl
   << ind(2) "proxy_set_header X-Real-IP         $remote_addr;" << endl
@@ -106,9 +106,10 @@ string ConfigureSite::server_locations(bool ssl, bool certified)
     {
       continue;
     }
-    else if ((location.ssl & SslRequired) && !ssl && certified)
+    else if ((location.ssl & SslRequired) && !ssl)
     {
-      stream << location_https_redirect(location);
+      if (certified)
+        stream << location_https_redirect(location);
     }
     else
     {
@@ -135,7 +136,7 @@ string ConfigureSite::server_common_conf(const string_view domain_name)
 
   stream
     << ind(1) "server_name " << domain_name << ';' << endl
-    << ind(1) "root " << site.var_directory << ';' << endl
+    << ind(1) "root " << site.var_directory.string() << ';' << endl
     << ind(1) "index index.html index.html index.php;" << endl
     << ind(1) "include /etc/nginx/standard-error-pages.conf*;" << endl
     << ind(1) "include /etc/nginx/letsencrypt.conf*;" << endl

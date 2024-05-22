@@ -20,7 +20,7 @@ int main(int argc, const char** argv)
 {
   HostieVariables::global = make_unique<HostieVariables>();
   Crails::CommandIndex index;
-  Crails::WithPath path_lock(HostieVariables::global->variable_or("hostie-home", "/var/lib/hosties"));
+  Crails::WithPath path_lock(HostieVariables::global->variable_or("hostie-root-path", "/var/lib/hosties"));
 
   index.add_command("crailscms", []() { return std::make_shared<CrailsCmsIndex>(); });
   index.add_command("wordpress", []() { return std::make_shared<WordpressIndex>(); });
