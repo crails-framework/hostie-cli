@@ -45,7 +45,7 @@ string MysqlDatabase::sql_query_command(const string_view query) const
   cout << "sql query: " << query << endl;
   command << "mysql"
           << " -u " << mysql_username
-          << " -h " << hostname
+        //<< " -h " << hostname
           << " -P " << port
           << " -e " << quoted(query);
   cerr << "== " << command.str() << endl;
