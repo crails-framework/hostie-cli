@@ -14,7 +14,7 @@ class OdooIndex : public Crails::CommandIndex
 public:
   OdooIndex()
   {
-    using namespace CrailsCms;
+    using namespace Odoo;
     add_command("list", []() { return std::make_shared<ListOdooCommand>(); });
     add_command("config", []() { return std::make_shared<EnvironmentCommand<Odoo::LiveInstanceCommand>>(); });
     add_command("status", []() { return std::make_shared<StatusCommand>(); });

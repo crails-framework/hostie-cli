@@ -12,7 +12,7 @@ public:
 
   bool start_service() override
   {
-    return Crails::run_command("systemctl enabled postgresql.service") &&
+    return Crails::run_command("systemctl enable postgresql.service") &&
            Crails::run_command("systemctl start postgresql.service");
   }
 };

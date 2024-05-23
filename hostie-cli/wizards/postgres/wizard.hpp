@@ -38,7 +38,7 @@ public:
     using namespace std;
     stringstream command;
 
-    command << "ALTER USER postgres WITH PASSWORD '" << password << "'";
+    command << "ALTER USER postgres WITH PASSWORD '\"'\"'" << password << "'\"'\"'";
     return run_sql_query(string_view(command.str()));
   }
 
@@ -47,7 +47,7 @@ public:
     using namespace std;
     stringstream command;
 
-    command << "su postgres -c \"psql -c " << quoted(query, '\'') << '"'; 
-    return Crails::run_command(command.str());
+    command << "su postgres -c 'psql -c \"" << query << "\"'";
+    return std::system(command.str().c_str()) == 0;
   }
 };
