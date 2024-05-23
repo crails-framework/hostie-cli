@@ -1,5 +1,6 @@
 #include "ubuntu.hpp"
 #include "../mysql/ubuntu.hpp"
+#include "../../wordpress/php.hpp"
 #include <iostream>
 
 using namespace std;
@@ -26,7 +27,8 @@ int Wizard::run()
     {
       if (download_wordpress())
       {
-        Crails::run_command("systemctl enable php-fpm") && Crails::run_command("systemctl start php-fpm");
+        string service_name = "php" + Wordpress::php_version() + "-fpm";
+        Crails::run_command("systemctl enable " + service_name) && Crails::run_command("systemctl start " + service_name);
         return 0;
       }
     }
