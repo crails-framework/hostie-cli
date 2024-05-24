@@ -34,7 +34,7 @@ Crails::DatabaseUrl PostgresDatabase::get_url() const
   return url;
 }
 
-string PostgresDatabase::sql_query_command(const string_view query) const
+string PostgresDatabase::sql_query_command(const string_view query, const string_view database) const
 {
   stringstream command, su_command;
 
@@ -46,17 +46,27 @@ string PostgresDatabase::sql_query_command(const string_view query) const
   command << "psql"
           << " -U " << postgres_username
           << " -h " << hostname
-          << " -p " << port
-          << " -tAc " << quoted(query);
+          << " -p " << port;
+  if (database.length() > 0)
+    command << " -d " << database;
+  command << " -tAc " << quoted(query);
   cerr << "== " << command.str() << endl;
   return command.str();
   //su_command << "sudo -u postgres bash -c " << quoted(command.str());
   //return su_command.str(); 
 }
 
-bool PostgresDatabase::run_query(const string_view query) const
+bool PostgresDatabase::run_query(const string_view query, const string_view database) const
 {
-  return std::system(sql_query_command(query).c_str()) == 0;
+  return std::system(sql_query_command(query, database).c_str()) == 0;
+}
+
+bool PostgresDatabase::table_exists(const string_view name) const
+{
+  stringstream query;
+
+  query << "SELECT 1 FROM pg_tables WHERE tablename = '" << name << '\'';
+  return run_query(query.str(), string_view(database_name));
 }
 
 bool PostgresDatabase::user_exists() const

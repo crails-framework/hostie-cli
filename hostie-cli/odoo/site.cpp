@@ -1,6 +1,7 @@
 #include "../environment.hpp"
 #include "../httpd.hpp"
 #include <crails/utils/semantics.hpp>
+#include <cstdlib>
 
 using namespace std;
 using namespace HttpServer;
@@ -12,8 +13,8 @@ namespace Odoo
     string target_prefix = Crails::dasherize(environment.get_project_name());
     string target_web = target_prefix + "-web";
     string target_chat = target_prefix + "-chat";
-    unsigned short port = 8069;
-    unsigned short chat_port = 8072;
+    unsigned short port = atoi(environment.get_variable("APPLICATION_PORT").c_str());
+    unsigned short chat_port = atoi(environment.get_variable("GEVENT_PORT").c_str());
 
     site.custom_settings = {
       "client_max_body_size 0;",
@@ -37,9 +38,9 @@ namespace Odoo
     site.locations.push_back(Location{
       "~* /web/static", target_web, AppProxyLocation, SslRequired,
       {
-        "proxy_cache_valid 200 90m",
-        "proxy_buffering on",
-        "expires 864000"
+        "proxy_cache_valid 200 90m;",
+        "proxy_buffering on;",
+        "expires 864000;"
       }
     });
   }

@@ -20,8 +20,9 @@ struct PostgresDatabase
   bool prepare_database() const;
   bool drop_database() const;
 
-  bool run_query(const std::string_view) const;
+  bool run_query(const std::string_view, const std::string_view database = "") const;
+  bool table_exists(const std::string_view) const;
 
 private:
-  std::string sql_query_command(const std::string_view) const;
+  std::string sql_query_command(const std::string_view, const std::string_view database = "") const;
 };

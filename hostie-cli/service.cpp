@@ -45,7 +45,7 @@ bool SystemService::status()
 bool SystemService::require()
 {
   using namespace Crails;
-  if (!service_file_exists() && !create_service_file())
+  if (!create_service_file())
   {
     cerr << "failed to create service file " << service_file_path().string() << endl;
     return false;
@@ -92,11 +92,8 @@ std::string SystemService::service_file_contents() const
 {
   stringstream stream;
 
-  cout << "GENERATING SERVICE FILE CONTENTS: GROUP = " << app_group << endl;
   cout << "Runtime directory: " << runtime_directory << endl;
-  cout << "Environment path: " << environment_path << endl;
-  cout << filesystem::exists(runtime_directory) << endl;
-  cout << filesystem::exists(environment_path) << endl;
+  cout << "Environ directory: " << environment_path << endl;
   stream
     << "[Unit]\n"
     << "Description=" << app_name << " CrailsCMS instance managed by cms-farm\n"
@@ -119,5 +116,6 @@ std::string SystemService::service_file_contents() const
     << "Restart=always\n\n"
     << "[Install]\n"
     << "WantedBy=multi-user.target";
+  cout << "GENERATING SERVICE FILE CONTENTS: " << endl << stream.str() << endl << endl;
   return stream.str();
 }

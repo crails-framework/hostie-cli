@@ -6,7 +6,7 @@ Supports the following web applications:
 - [Wordpress](https://wordpress.com/)
 - [CrailsCMS](https://github.com/crails-cms/crails-cms)
 - [NextCloud](https://nextcloud.com) (TODO)
-- [Odoo](https://www.odoo.com) (TODO)
+- [Odoo](https://www.odoo.com)
 
 ## Installing
 
