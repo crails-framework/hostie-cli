@@ -135,6 +135,7 @@ string ConfigureSite::server_common_conf(const string_view domain_name)
 
   stream
     << ind(1) "server_name " << domain_name << ';' << endl
+    << ind(1) "root " << site.var_directory.string() << ';' << endl
     << ind(1) "include /etc/nginx/standard-error-pages.conf*;" << endl
     << ind(1) "include /etc/nginx/letsencrypt.conf*;" << endl
     << server_custom_settings(site);

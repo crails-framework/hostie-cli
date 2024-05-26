@@ -8,9 +8,11 @@ template<typename WIZARD_BASE>
 class PostgresWizard : public WIZARD_BASE
 {
   typedef WIZARD_BASE Super;
-  HostieVariables store;
+  HostieVariables& store;
   std::string password;
 public:
+  PostgresWizard() : store(*HostieVariables::global) {}
+
   bool is_installed() const { return store.has_variable("postgres_root"); }
 
   int run()

@@ -13,7 +13,7 @@
 #include "../databases/mysql.hpp"
 #include "../file_ownership.hpp"
 #include "../hostie_variables.hpp"
-#include "php.hpp"
+#include "../php.hpp"
 
 using namespace std;
 using namespace Wordpress;
@@ -26,14 +26,16 @@ int CreateCommand::run()
     MysqlDatabase database;
 
     user.name = options["user"].as<string>();
-    user.group = options["group"].as<string>();
+    user.group = HostieVariables::global->variable("web-group");
     database.user = user.name;
     database.database_name = options["name"].as<string>();
     database.password = Crails::generate_random_string(
-      MysqlDatabase::password_charset, 12
+      MysqlDatabase::password_charset, 32
     );
 
-    if (!prepare_runtime_directory(user))
+    if (!create_user(user) ||
+        !prepare_runtime_directory(user) ||
+        !prepare_wordpress(user))
       return cancel(user, database);
 
     environment.set_variables({
@@ -46,22 +48,11 @@ int CreateCommand::run()
 
     if (generate_wp_config(user, database) &&
         generate_fpm_pool(user) &&
-        environment.save() &&
-        create_user(user) &&
+        prepare_environment_file() &&
         database.prepare_user() &&
         database.prepare_database())
     {
       state += DatabaseCreated;
-/*
-      ostringstream perm_cmd;
-      perm_cmd << "chown -R " << user.name << ' ' << var_directory;
-      perm_cmd << " && ";
-      perm_cmd << "chgrp -R www-data " << var_directory;
-      perm_cmd << " && ";
-      perm_cmd << "chmod g+w " << (var_directory / "wp-config.php");
-      if (std::system(perm_cmd.str().c_str()) != 0)
-        cerr << "failed to set permission for php-fpm in " << var_directory << endl;
-*/
       return 0;
     }
     return cancel(user, database);
@@ -69,49 +60,9 @@ int CreateCommand::run()
   return 13;
 }
 
-bool CreateCommand::create_user(InstanceUser& user)
-{
-  if (user.require())
-  {
-    state += UserCreated;
-    return true;
-  }
-  return false;
-}
-
-bool CreateCommand::prepare_runtime_directory(const InstanceUser& user)
-{
-  if (options.count("runtime-directory"))
-    var_directory = filesystem::weakly_canonical(options["runtime-directory"].as<string>());
-  else if (std::getenv("SITES_DIRECTORY") != 0)
-    var_directory = filesystem::weakly_canonical(getenv("SITES_DIRECTORY")) / options["name"].as<string>();
-  else
-  {
-    cerr << "could not deduce runtime directory" << endl;
-    return false;
-  }
-
-  if (filesystem::is_directory(var_directory) || filesystem::create_directories(var_directory))
-    cerr << "using runtime directory: " << var_directory << endl;
-  else
-  {
-    cerr << "could not create runtime directory " << var_directory << endl;
-    return false;
-  }
-  state += VarDirectoryCreated;
-  return prepare_wordpress(user);
-}
-
 filesystem::path CreateCommand::find_wordpress_source() const
 {
-  if (options.count("wordpress-source"))
-    return filesystem::weakly_canonical(options["wordpress-source"].as<string>());
-  else if (std::getenv("WORDPRESS_DIRECTORY") != 0)
-    return filesystem::weakly_canonical(getenv("WORDPRESS_DIRECTORY"));
-  else if (HostieVariables::global->has_variable("wordpress-source"))
-    return filesystem::weakly_canonical(HostieVariables::global->variable("wordpress-source"));
-  cerr << "could not deduce wordpress directory" << endl;
-  return filesystem::path();
+  return find_php_source("wordpress", "WORDPRESS_DIRECTORY");
 }
 
 bool CreateCommand::prepare_wordpress(const InstanceUser& user)
@@ -140,7 +91,7 @@ bool CreateCommand::prepare_wordpress(const InstanceUser& user)
   }
   // Creating wp-content
   filesystem::create_directories(wp_content_target);
-  filesystem::create_hard_link         (wp_content_source / "index.php", wp_content_target / "index.php");
+  filesystem::create_hard_link        (wp_content_source / "index.php", wp_content_target / "index.php");
   filesystem::create_directory_symlink(wp_content_source / "languages", wp_content_target / "languages");
   for (const string& name : vector<string>{"plugins", "themes"})
   {
@@ -210,75 +161,9 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
   return false;
 }
 
-filesystem::path CreateCommand::find_php_fpm_socket_path(const filesystem::path& fpm_conf_path)
-{
-  filesystem::path conf = fpm_conf_path.parent_path() / "www.conf";
-  filesystem::path result;
-  string source;
-  
-  // Scanning www.conf to use a modified version of the default socket path
-  if (Crails::read_file(conf, source))
-  {
-    auto parts = Crails::split<string_view, vector<string_view>>(string_view(source), '\n');
-    auto it = find_if(parts.begin(), parts.end(), [](const string_view line) -> bool
-    {
-      return line.find("listen = ") == 0;
-    });
-
-    if (it != parts.end())
-    {
-      result = it->substr(9);
-      result = result.replace_filename(
-        result.stem().string() + '-' + environment.get_project_name() + result.extension().string()
-      );
-    }
-  }
-  // Falling back to a debian-compatible approach
-  if (result.empty())
-    result = "/run/php/php" + php_version() + "-fpm-" + environment.get_project_name() + ".sock";
-  environment.set_variable("PHP_FPM_SOCKET", result.string());
-  return result;
-}
-
-bool CreateCommand::generate_fpm_pool(const InstanceUser& user)
-{
-  filesystem::path fpm_conf_path = fpm_pool_path(environment);
-  ofstream stream(fpm_conf_path);
-
-
-  if (stream.is_open())
-  {
-    stream
-      << '[' << environment.get_project_name() << ']' << '\n'
-      << "user = " << user.name << '\n'
-      << "group = " << HostieVariables::global->variable("web-group") << '\n'
-      << "listen = " << find_php_fpm_socket_path(fpm_conf_path).string() << '\n'
-      << "listen.owner = " << HostieVariables::global->variable("web-user")<< '\n'
-      << "listen.group = " << HostieVariables::global->variable("web-group") << '\n'
-      << "chdir = " << var_directory.string() << '\n'
-      << "pm = ondemand\n"
-      << "pm.max_children = 4\n";
-    stream.close();
-    state += FpmPoolCreated;
-    return true;
-  }
-  else if (fpm_conf_path.empty())
-    cerr << "failed to deduce php-fpm conf directory" << endl;
-  else
-    cerr << "failed to create php fpm pool at " << fpm_conf_path << endl;
-  return false;
-}
-
 int CreateCommand::cancel(InstanceUser& user, MysqlDatabase& database)
 {
-  filesystem::remove(environment.get_path());
-  if ((state & VarDirectoryCreated) > 0)
-    filesystem::remove_all(var_directory);
   if ((state & DatabaseCreated) > 0)
     database.drop_database();
-  if ((state & UserCreated) > 0)
-    user.delete_user();
-  if ((state & FpmPoolCreated) > 0)
-    filesystem::remove(fpm_pool_path(environment));
-  return -1;
+  return PhpFpmCreator::cancel(user);
 }

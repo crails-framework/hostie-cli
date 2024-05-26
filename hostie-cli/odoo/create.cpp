@@ -115,7 +115,7 @@ int CreateCommand::run()
   database.user = user.name;
   database.database_name = options["name"].as<string>();
   database.password = Crails::generate_random_string(
-    PostgresDatabase::password_charset, 12
+    PostgresDatabase::password_charset, 32
   );
 
   service.app_name = options["name"].as<string>();

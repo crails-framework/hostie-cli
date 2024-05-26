@@ -10,6 +10,8 @@ public:
   bool download_file(const std::string_view url, const std::filesystem::path& target) const;
   bool download_tar_archive(const std::string_view url) const;
   bool download_zip_archive(const std::string_view url) const;
+  bool extract_source(const std::string_view url, const std::string_view target_name, const std::filesystem::path& target) const;
+  bool apply_web_permissions(const std::filesystem::path& target) const;
 
   template<typename WIZARD>
   static bool require_wizard()

@@ -53,7 +53,7 @@ int CreateCommand::run()
   database.user = user.name;
   database.database_name = service.app_name;
   database.password = Crails::generate_random_string(
-    PostgresDatabase::password_charset, 12
+    PostgresDatabase::password_charset, 32
   );
 
   vector<string> link_paths{

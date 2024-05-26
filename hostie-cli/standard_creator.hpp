@@ -18,8 +18,15 @@ public:
     UserCreated = 4,
     LogDirectoryCreated = 8,
   };
-    
+
+  enum OptionFlags
+  {
+    WithoutPort = 1,
+    WithoutGroup = 2
+  };
+
   virtual void options_description(boost::program_options::options_description& options) const override;
+  void custom_options_description(boost::program_options::options_description& options, int flags = 0) const;
 
   virtual bool prepare_environment_file();
   virtual bool prepare_runtime_directory(const InstanceUser&);

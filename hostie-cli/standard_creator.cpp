@@ -10,11 +10,25 @@ using namespace std;
   
 void StandardCreator::options_description(boost::program_options::options_description& options) const
 {
+  custom_options_description(options, 0);
+}
+
+void StandardCreator::custom_options_description(boost::program_options::options_description& options, int flag) const
+{
   InstanceCommand::options_description(options);
+  if ((flag & WithoutPort) == 0)
+  {
+    options.add_options()
+      ("port,p", boost::program_options::value<unsigned short>(), "network port to use");
+  }
   options.add_options()
-    ("port,p", boost::program_options::value<unsigned short>(), "network port to use")
-    ("user,u", boost::program_options::value<string>(), "user name")
-    ("group,g", boost::program_options::value<string>(), "group name")
+    ("user,u", boost::program_options::value<string>(), "user name");
+  if ((flag & WithoutGroup) == 0)
+  {
+    options.add_options()
+      ("group,g", boost::program_options::value<string>(), "group name");
+  }
+  options.add_options()
     ("runtime-directory,d", boost::program_options::value<string>(), "runtime directory (will store attachments and such)")
     ("env,e", boost::program_options::value<vector<string>>()->multitoken(), "list of environment variables or files");
 }

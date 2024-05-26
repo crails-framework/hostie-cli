@@ -1,5 +1,7 @@
 #include "wizard.hpp"
+#include "../file_ownership.hpp"
 #include <crails/cli/process.hpp>
+#include <crails/cli/filesystem.hpp>
 #include <boost/process.hpp>
 #include <iostream>
 
@@ -106,4 +108,56 @@ bool WizardBase::download_zip_archive(const string_view url) const
       cerr << "failed to download " << url << endl;
   }
   return false;
+}
+
+bool WizardBase::extract_source(const std::string_view url, const std::string_view target_name, const std::filesystem::path& target) const
+{
+  if (download_tar_archive(url))
+  {
+    if (!filesystem::exists(target))
+      filesystem::create_directories(target.parent_path());
+    else
+      filesystem::remove_all(target);
+    if (Crails::move_file(target_name, target))
+      return true;
+    else
+      cerr << "Failed to move " << target_name << " to " << target << endl;
+  }
+  else
+    cerr << "Failed to download " << url << endl;
+  return false;
+}
+
+bool WizardBase::apply_web_permissions(const filesystem::path& target) const
+{
+  auto uid = Crails::uid_from_username(HostieVariables::global->variable("web-user"));
+  auto gid = Crails::gid_from_groupname(HostieVariables::global->variable("web-group"));
+  auto directory_permissions =
+    filesystem::perms::owner_all |
+    filesystem::perms::group_read | filesystem::perms::group_exec;
+  auto exe_permissions = directory_permissions;
+  auto file_permissions =
+    filesystem::perms::owner_all | filesystem::perms::group_read;
+
+  for (const auto& entry : filesystem::directory_iterator(target))
+  {
+    const filesystem::path path = entry.path();
+
+    Crails::chown(path, uid);
+    Crails::chgrp(path, gid);
+    if (filesystem::is_directory(path))
+    {
+      filesystem::permissions(path, directory_permissions);
+      apply_web_permissions(path);
+    }
+    else if (path.extension() == ".php")
+    {
+      filesystem::permissions(path, exe_permissions);
+    }
+    else
+    {
+      filesystem::permissions(path, file_permissions);
+    }
+  }
+  return true;
 }

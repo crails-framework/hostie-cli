@@ -3,17 +3,20 @@
 #include <crails/cli/process.hpp>
 #include <iostream>
 #include "../../databases/mysql.hpp"
+#include "../../hostie_variables.hpp"
 
 template<typename WIZARD_BASE>
 class MysqlWizard : public WIZARD_BASE
 {
   typedef WIZARD_BASE Super;
-  HostieVariables store;
+  HostieVariables& store;
   std::string password;
   bool mysql_password_required = false;
 protected:
   std::string service_name;
 public:
+  MysqlWizard() : store(*HostieVariables::global) {}
+
   bool is_installed() const { return store.has_variable("mysql_root"); }
 
   int run()
