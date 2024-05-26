@@ -33,10 +33,10 @@ namespace Odoo
       "/", target_web, AppProxyLocation, SslRequired
     });
     site.locations.push_back(Location{
-      "/longpolling", target_chat, AppProxyLocation, SslRequired
+      "/longpolling", target_chat, AppProxyLocation, SslOnly
     });
     site.locations.push_back(Location{
-      "~* /web/static", target_web, AppProxyLocation, SslRequired,
+      "~* /web/static", target_web, AppProxyLocation, SslOnly,
       {
         "proxy_cache_valid 200 90m;",
         "proxy_buffering on;",

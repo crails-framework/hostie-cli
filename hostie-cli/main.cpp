@@ -8,6 +8,7 @@
 #include "crailscms/index.hpp"
 #include "wordpress/index.hpp"
 #include "odoo/index.hpp"
+#include "nextcloud/index.hpp"
 #include "wizards/index.hpp"
 #include "nginx/index.hpp"
 #include "hostie_variables.hpp"
@@ -25,7 +26,7 @@ int main(int argc, const char** argv)
   index.add_command("crailscms", []() { return std::make_shared<CrailsCmsIndex>(); });
   index.add_command("wordpress", []() { return std::make_shared<WordpressIndex>(); });
   index.add_command("odoo",      []() { return std::make_shared<OdooIndex>(); });
-  //index.add_command("nextcloud", []() { return nullptr; });
+  index.add_command("nextcloud", []() { return std::make_shared<NextCloudIndex>(); });
   index.add_command("nginx", []() { return std::make_shared<Nginx::IndexCommand>(); });
   index.add_command("wizard", []() { return std::make_shared<WizardsIndex>(); });
   if (index.initialize(argc, argv))

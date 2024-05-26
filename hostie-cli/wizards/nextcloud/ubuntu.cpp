@@ -4,7 +4,7 @@
 #include <iostream>
 
 using namespace std;
-using namespace Wordpress::Ubuntu;
+using namespace NextCloud::Ubuntu;
 
 int Wizard::run()
 {
@@ -12,12 +12,21 @@ int Wizard::run()
     "php",
     "php-fpm",
     "php-mysql",
+    "php-bcmath",     // for passwordless login
     "php-curl",
-    "php-exif",
+    "php-ctype",
+    "php-dom",
+    "php-exif",       // image rotation
     "php-fileinfo",
+    "php-gd",
+    "php-gmp",
     "php-imagick",
+    "php-imap",       // for external user authentication
+    "php-intl",       // increases language translation perf
     "php-json",
     "php-mbstring",
+    "php-net-ftp",    // for FTP storage / external user authentication
+    "php-posix",
     "php-xml",
     "php-zip"
   };
@@ -25,7 +34,7 @@ int Wizard::run()
   {
     if (install_requirements())
     {
-      if (download_wordpress())
+      if (download_nextcloud())
       {
         string service_name = "php" + php_version() + "-fpm";
 
@@ -41,4 +50,3 @@ int Wizard::run()
     cerr << "failed to install mysql" << endl;
   return -1;
 }
-

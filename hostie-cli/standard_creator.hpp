@@ -34,5 +34,8 @@ public:
   virtual std::filesystem::path get_log_directory() const;
   virtual bool create_user(InstanceUser& user);
 
+  std::string default_admin_login() const;
+  std::string default_admin_password() const;
+
   virtual int cancel(InstanceUser&);
 };

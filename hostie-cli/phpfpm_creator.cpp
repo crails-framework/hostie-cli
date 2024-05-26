@@ -4,6 +4,7 @@
 #include "php.hpp"
 #include <crails/read_file.hpp>
 #include <crails/utils/split.hpp>
+#include <crails/cli/process.hpp>
 #include <fstream>
 
 using namespace std;
@@ -69,15 +70,23 @@ bool PhpFpmCreator::generate_fpm_pool(const InstanceUser& user)
       << "chdir = " << var_directory.string() << '\n'
       << "pm = ondemand\n"
       << "pm.max_children = 4\n";
+    append_custom_fpm_pool_settings(stream);
     stream.close();
     state += FpmPoolCreated;
-    return true;
+    return restart_php_fpm();
   }
   else if (fpm_conf_path.empty())
     cerr << "failed to deduce php-fpm conf directory" << endl;
   else
     cerr << "failed to create php fpm pool at " << fpm_conf_path << endl;
   return false;
+}
+
+bool PhpFpmCreator::restart_php_fpm()
+{
+  string service_name = HostieVariables::global->variable_or("php-fpm-service-name", "php-fpm");
+
+  return Crails::run_command("systemctl reload " + service_name);
 }
 
 int PhpFpmCreator::cancel(InstanceUser& user)

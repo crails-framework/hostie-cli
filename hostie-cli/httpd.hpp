@@ -19,13 +19,16 @@ namespace HttpServer
     DirectoryLocation,
     AppProxyLocation,
     PhpFpmLocation,
+    RedirectLocation,
+    CustomLocation
   };
 
   enum SslState
   {
     NoSslState = 0,
     SslOmit = 1,
-    SslRequired = 2
+    SslRequired = 2,
+    SslOnly = 4
   };
 
   struct Location
@@ -51,6 +54,7 @@ namespace HttpServer
     std::vector<Upstream> upstreams;
     std::vector<Location> locations;
     std::vector<std::string> custom_settings;
+    std::string protocol;
     static const std::map<std::string, SiteInitializer> initializers;
   };
 }

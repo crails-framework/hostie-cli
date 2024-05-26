@@ -5,6 +5,7 @@
 #include "standard_creator.hpp"
 #include "service.hpp"
 #include "user.hpp"
+#include "hostie_variables.hpp"
 
 using namespace std;
   
@@ -75,7 +76,7 @@ bool StandardCreator::prepare_runtime_directory(const InstanceUser& user)
 
   stringstream chown_command, chgrp_command;
   chown_command << "chown -R " << user.name  << ' ' << var_directory;
-  chgrp_command << "chown -R " << user.group << ' ' << var_directory;
+  chgrp_command << "chgrp -R " << user.group << ' ' << var_directory;
   cout << "+ " << chown_command.str() << " && " << chgrp_command.str() << endl;
   return system(chown_command.str().c_str()) == 0 && system(chgrp_command.str().c_str()) == 0;
 }
@@ -117,6 +118,16 @@ bool StandardCreator::create_user(InstanceUser& user)
     return true;
   }
   return false;
+}
+
+string StandardCreator::default_admin_login() const
+{
+  return HostieVariables::global->variable_or("default-admin-login", "admin");
+}
+
+string StandardCreator::default_admin_password() const
+{
+  return HostieVariables::global->variable_or("default-admin-password", "1234");
 }
 
 int StandardCreator::cancel(InstanceUser& user)

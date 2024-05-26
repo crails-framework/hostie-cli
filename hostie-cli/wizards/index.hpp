@@ -5,6 +5,7 @@
 #include "nginx/platforms.hpp"
 #include "wordpress/platforms.hpp"
 #include "odoo/platforms.hpp"
+#include "nextcloud/platforms.hpp"
 
 class WizardsIndex : public Crails::CommandIndex
 {
@@ -25,5 +26,6 @@ public:
     add_command("nginx", nginx_platform_installer());
     add_command("wordpress", wordpress_platform_installer());
     add_command("odoo", odoo_platform_installer());
+    add_command("nextcloud", nextcloud_platform_installer());
   }
 };

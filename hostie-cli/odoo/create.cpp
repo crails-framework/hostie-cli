@@ -135,7 +135,7 @@ int CreateCommand::run()
     {"ODOO_RC",          odoo_rc_path().string()}
   });
 
-  initialize_admin_password(HostieVariables::global->variable_or("odoo-default-password", "1234"));
+  initialize_admin_password(default_admin_password());
 
   if (generate_odoo_conf(database) &&
       prepare_environment_file() &&
@@ -171,8 +171,9 @@ int CreateCommand::run()
 
 bool CreateCommand::update_admin_password(PostgresDatabase& database) const
 {
+  setenv("ODOO_ADMIN_LOGIN", default_admin_login().c_str(), 1);
   setenv("ODOO_ADMIN_PASSWORD", encoded_admin_password.c_str(), 1);
-  return database.run_query("UPDATE res_users SET password='$ODOO_ADMIN_PASSWORD' WHERE login='admin'", string_view(database.database_name));
+  return database.run_query("UPDATE res_users SET password='$ODOO_ADMIN_PASSWORD', login='$ODOO_ADMIN_LOGIN'  WHERE login='admin'", string_view(database.database_name));
 }
 
 bool CreateCommand::prepare_database(const PostgresDatabase& database)

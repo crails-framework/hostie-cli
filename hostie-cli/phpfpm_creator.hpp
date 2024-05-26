@@ -1,6 +1,7 @@
 #pragma once
 #include "./standard_creator.hpp"
 #include <filesystem>
+#include <ostream>
 
 class SystemService;
 class InstanceUser;
@@ -25,6 +26,8 @@ public:
   std::filesystem::path find_php_source(const std::string& name, const char* env_key) const;
   std::filesystem::path find_php_fpm_socket_path(const std::filesystem::path& fpm_conf_path);
   bool generate_fpm_pool(const InstanceUser&);
+  bool restart_php_fpm();
+  virtual void append_custom_fpm_pool_settings(std::ostream&) {}
 
   virtual int cancel(InstanceUser&) override;
 };

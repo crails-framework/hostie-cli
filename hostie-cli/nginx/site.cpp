@@ -38,11 +38,21 @@ static string server_custom_settings(const Site& site)
   return stream.str();
 }
 
+string ConfigureSite::location_custom_pass(const Location& location, bool ssl)
+{
+  ostringstream stream;
+  stream
+  << ind(1) "location " << location.path << " {" << endl
+  << location_custom_settings(location)
+  << ind(1) "}" << endl;
+  return stream.str();
+}
+
 string ConfigureSite::location_directory_pass(const Location& location, bool ssl)
 {
   ostringstream stream;
   stream
-  << ind(1) "location " << location.path << " {"
+  << ind(1) "location " << location.path << " {" << endl
   << ind(2) "root " << location.target << ';' << endl
   << location_custom_settings(location)
   << ind(1) "}" << endl;
@@ -85,15 +95,22 @@ string ConfigureSite::location_proxy_pass(const Location& location, bool ssl)
   return stream.str();
 }
 
-string ConfigureSite::location_https_redirect(const Location& location)
+string ConfigureSite::location_redirect(const Location& location)
 {
   ostringstream stream;
 
   stream
   << ind(1) "location " << location.path << '{' << endl
-  << ind(2) "return 301 https://$server_name$request_uri;" << endl
+  << ind(2) "return 301 " << location.target << ';' << endl
   << ind(1) '}' << endl;
   return stream.str();
+}
+
+string ConfigureSite::location_https_redirect(const Location& location)
+{
+  return location_redirect(Location{
+    location.path, "https://$server_name$request_uri;"
+  });
 }
 
 string ConfigureSite::server_locations(bool ssl, bool certified)
@@ -102,7 +119,8 @@ string ConfigureSite::server_locations(bool ssl, bool certified)
 
   for (const Location& location : site.locations)
   {
-    if (ssl && !(location.ssl & SslOmit))
+    if ((ssl && (location.ssl & SslOmit) > 0) ||
+        (!ssl && (location.ssl & SslOnly) > 0 && certified))
     {
       continue;
     }
@@ -122,6 +140,12 @@ string ConfigureSite::server_locations(bool ssl, bool certified)
         break ;
       case PhpFpmLocation:
         stream << location_phpfpm_pass(location, ssl);
+        break ;
+      case RedirectLocation:
+        stream << location_redirect(location);
+        break ;
+      case CustomLocation:
+        stream << location_custom_pass(location, ssl);
         break ;
       }
     }
@@ -149,10 +173,15 @@ string ConfigureSite::server_https_conf(const string_view domain_name)
     ostringstream stream;
     filesystem::path fullchain_path = certificate_directory(domain_name) / "fullchain.pem";
     filesystem::path privkey_path = certificate_directory(domain_name) / "privkey.pem";
+    std::string listen_options = "ssl";
+
+    if (site.protocol.length())
+      listen_options += ' ' + site.protocol;
 
     stream
       << "server {" << endl
-      << ind(1) "listen 443 ssl;" << endl
+      << ind(1) "listen 443 " << listen_options << ';' << endl
+      << ind(1) "listen [::]:443 " << listen_options << ';' << endl
       << ind(1) "ssl_certificate " << fullchain_path.string() << ';' << endl
       << ind(1) "ssl_certificate_key " << privkey_path.string() << ';' << endl
       << server_common_conf(domain_name) << endl
@@ -168,10 +197,15 @@ string ConfigureSite::server_http_conf(const string_view domain_name)
 {
   ostringstream stream;
   bool ssl_enabled = is_domain_certified(domain_name);
+  std::string listen_options;
+
+  if (site.protocol.length())
+    listen_options += ' ' + site.protocol;
 
   stream
     << "server {" << endl
-    << ind(1) "listen 80;" << endl
+    << ind(1) "listen 80" << listen_options << ';' << endl
+    << ind(1) "listen [::]:80" << listen_options << ';' << endl
     << server_common_conf(domain_name) << endl
     << server_locations(false, ssl_enabled)
     << '}' << endl
