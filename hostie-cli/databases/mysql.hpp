@@ -8,6 +8,7 @@ struct MysqlDatabase
   std::string user, password;
   std::string database_name;
   std::string hostname = "127.0.0.1";
+  std::string database_options;
   unsigned short port = 3306;
 
   static const std::string password_charset;

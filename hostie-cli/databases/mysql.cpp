@@ -83,12 +83,15 @@ bool MysqlDatabase::prepare_database() const
   string create_query;
   string grant_query;
 
-  create_query = "CREATE DATABASE " + database_name + ";";
+  create_query = "CREATE DATABASE " + database_name + ' ' + database_options + ';';
   if (run_query(create_query))
   {
     grant_query = "GRANT ALL PRIVILEGES ON " + database_name + ".* TO '" + user + "'@'localhost';";
     if (run_query(grant_query))
+    {
+      run_query("FLUSH PRIVILEGES");
       return true;
+    }
     else
       cerr << "failed to grant user " << user << " permissions on database " << database_name << endl;
   }
