@@ -1,4 +1,5 @@
 #include <crails/read_file.hpp>
+#include <crails/utils/join.hpp>
 #include <sstream>
 #include <cstdlib>
 #include <iostream>
@@ -43,11 +44,19 @@ void StandardCreator::custom_options_description(boost::program_options::options
   }
   options.add_options()
     ("runtime-directory,d", boost::program_options::value<string>(), "runtime directory (will store attachments and such)")
+    ("domains,x", boost::program_options::value<vector<string>>()->multitoken(), "list of domain names")
     ("env,e", boost::program_options::value<vector<string>>()->multitoken(), "list of environment variables or files");
 }
 
 bool StandardCreator::prepare_environment_file()
 {
+  if (options.count("domains"))
+  {
+    environment.set_variable(
+      "HOSTIE_DOMAINS",
+      Crails::join(options["domains"].as<vector<string>>(), ';')
+    );
+  }
   if (options.count("env"))
   {
     for (const string& param : options["env"].as<vector<string>>())
