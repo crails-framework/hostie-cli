@@ -1,4 +1,5 @@
 #include "hostie_variables.hpp"
+#include <filesystem>
 #include <cstdlib>
 #include <iomanip>
 #include <sstream>
@@ -25,4 +26,10 @@ HostieVariables::HostieVariables() : Crails::ProjectVariables(store_path())
 {
   system(touch_store_command().c_str());
   initialize();
+}
+
+void HostieVariables::save()
+{
+  Crails::ProjectVariables::save();
+  filesystem::permissions(store_path(), filesystem::perms::owner_read | filesystem::perms::owner_write);
 }

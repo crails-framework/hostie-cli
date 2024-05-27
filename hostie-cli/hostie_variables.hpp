@@ -7,5 +7,7 @@ class HostieVariables : public Crails::ProjectVariables
 public:
   HostieVariables();
 
+  void save();
+
   static std::unique_ptr<HostieVariables> global;
 };

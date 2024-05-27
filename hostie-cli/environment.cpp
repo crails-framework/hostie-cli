@@ -91,6 +91,7 @@ bool InstanceEnvironment::save()
     for (auto it = variables.begin() ; it != variables.end() ; ++it)
       stream << it->first << '=' << quoted(it->second) << '\n';
     stream.close();
+    filesystem::permissions(environment_path, filesystem::perms::owner_read | filesystem::perms::owner_write);
     return true;
   }
   return false;
