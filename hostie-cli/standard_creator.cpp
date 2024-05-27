@@ -14,6 +14,18 @@ void StandardCreator::options_description(boost::program_options::options_descri
   custom_options_description(options, 0);
 }
 
+bool StandardCreator::initialize(int argc, const char** argv)
+{
+  if (InstanceCommand::initialize(argc, argv))
+  {
+    if (environment.already_exists())
+      cerr << "cannot create instance, name already taken (file " << environment.get_path() << " already exists.)" << endl;
+    else
+      return true;
+  }
+  return false;
+}
+
 void StandardCreator::custom_options_description(boost::program_options::options_description& options, int flag) const
 {
   InstanceCommand::options_description(options);

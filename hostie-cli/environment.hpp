@@ -17,6 +17,7 @@ public:
   void set_variable(const std::string& name, const std::string& value);
   void set_variables(const std::map<std::string, std::string>&);
   void append(const std::string_view);
+  bool already_exists() const;
 
 private:
   std::filesystem::path environment_path;

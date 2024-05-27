@@ -25,6 +25,7 @@ public:
     WithoutGroup = 2
   };
 
+  virtual bool initialize(int argc, const char** argv) override;
   virtual void options_description(boost::program_options::options_description& options) const override;
   void custom_options_description(boost::program_options::options_description& options, int flags = 0) const;
 

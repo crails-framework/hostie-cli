@@ -95,3 +95,8 @@ bool InstanceEnvironment::save()
   }
   return false;
 }
+
+bool InstanceEnvironment::already_exists() const
+{
+  return filesystem::exists(environment_path);
+}
