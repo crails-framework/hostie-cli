@@ -18,6 +18,7 @@ namespace Nginx
     std::string server_conf(const std::string_view domain_name);
     std::string site_conf();
   public:
+    void options_description(boost::program_options::options_description& options) const override;
     int run() override;
     int make_site();
   };

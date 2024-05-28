@@ -2,6 +2,8 @@
 #include <boost/process.hpp>
 #include <ctime>
 #include <iomanip>
+#include <sstream>
+#include <cstdlib>
 
 using namespace std;
 using namespace Nginx;
@@ -65,4 +67,34 @@ time_t CertificateCommand::certificate_expiry_time(const string_view domain_name
 
   stream >> get_time(&time_struct, "%b %d %H:%M:%S %Y");
   return mktime(&time_struct);
+}
+
+bool CertificateCommand::renew_certificates() const
+{
+  vector<string> certifiable_domain_names;
+
+  for (const string& domain_name : domain_names())
+  {
+    if (is_domain_certificate_renewable(domain_name))
+      certifiable_domain_names.push_back(domain_name);
+  }
+  if (renew_certificates_for(certifiable_domain_names))
+    return true;
+  else
+    cerr << "certbot: failed to certify domains" << endl;
+  return false;
+}
+
+bool CertificateCommand::renew_certificates_for(const vector<string>& domain_names) const
+{
+  ostringstream command;
+
+  command << "certbot --nginx -n --agree-tos";
+  command << " --expand";
+  command << " -m " << quoted(webmaster_email());
+  for (const string& domain_name : domain_names)
+     command << " -d " << quoted(domain_name);
+  if (system(command.str().c_str()) == 0)
+    return 0;
+  return -1;
 }

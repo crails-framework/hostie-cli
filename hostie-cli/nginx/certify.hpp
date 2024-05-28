@@ -7,7 +7,5 @@ namespace Nginx
   {
   public:
     int run() override;
-
-    bool create_certificate(const std::vector<std::string>&);
   };
 }

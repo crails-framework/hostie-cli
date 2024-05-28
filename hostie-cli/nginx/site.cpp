@@ -9,6 +9,13 @@ using namespace std;
 using namespace Nginx;
 using namespace HttpServer;
 
+void ConfigureSite::options_description(boost::program_options::options_description& options) const
+{
+  InstanceCommand::options_description(options);
+  options.add_options()
+    ("certify", "create or update SSL certificates using letsencrypt");
+}
+
 static string php_version()
 {
   string php_version;
@@ -268,6 +275,13 @@ int ConfigureSite::make_site()
 
 int ConfigureSite::run()
 {
-  return make_site();
+  int status = make_site();
+
+  if (status == 0 && options.count("certify"))
+  {
+    if (!renew_certificates())
+      cerr << "failed to renew certificates" << endl;
+  }
+  return status;
 }
 
