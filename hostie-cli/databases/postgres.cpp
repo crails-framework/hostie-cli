@@ -84,9 +84,9 @@ bool PostgresDatabase::prepare_user() const
   string query;
 
   if (!user_exists())
-    query = "CREATE USER " + user + " WITH PASSWORD '" + password + "';";
+    query = "CREATE USER \"" + user + "\" WITH PASSWORD '" + password + "';";
   else
-    query = "ALTER USER " + user + " WITH PASSWORD '" + password + "';";
+    query = "ALTER USER \"" + user + "\" WITH PASSWORD '" + password + "';";
   return run_query(string_view(query));
 }
 
@@ -95,7 +95,7 @@ bool PostgresDatabase::prepare_database() const
   string create_query;
   string grant_query;
 
-  create_query = "CREATE DATABASE " + database_name + " WITH OWNER " + user;
+  create_query = "CREATE DATABASE \"" + database_name + "\" WITH OWNER \"" + user + '"';
   if (run_query(create_query))
   {
     grant_query = "GRANT ALL PRIVILEGES ON DATABASE \"" + database_name + "\" TO \"" + user + '"';
@@ -111,7 +111,7 @@ bool PostgresDatabase::prepare_database() const
 
 bool PostgresDatabase::drop_database() const
 {
-  string query = "DROP DATABASE " + database_name;
+  string query = "DROP DATABASE \"" + database_name + '"';
 
   if (run_query(query))
     return true;
