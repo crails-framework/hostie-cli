@@ -80,10 +80,7 @@ bool StandardCreator::prepare_runtime_directory(const InstanceUser& user)
   else if (getenv("VAR_DIRECTORY") != 0)
     var_directory = filesystem::weakly_canonical(getenv("VAR_DIRECTORY")) / options["name"].as<string>();
   else
-  {
-    cerr << "could not deduce runtime directory" << endl;
-    return false;
-  }
+    var_directory = InstanceEnvironment::get_root_path() / options["name"].as<string>();
 
   if (filesystem::is_directory(var_directory) || filesystem::create_directories(var_directory))
     cerr << "using runtime directory: " << var_directory << endl;
