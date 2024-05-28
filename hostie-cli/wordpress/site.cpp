@@ -27,9 +27,6 @@ namespace Wordpress
       site.locations.push_back(Location{
         "/wp-admin", target, PhpFpmLocation, SslOmit | SslRequired
       });
-      site.locations.push_back(Location{
-        "/wp-admin.php", target, PhpFpmLocation, SslOmit | SslRequired
-      });
     }
   }
 }

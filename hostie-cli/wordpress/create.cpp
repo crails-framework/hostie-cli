@@ -143,6 +143,7 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
     stream
       << "$table_prefix = 'wp_';\n"
       << "define('WP_DEBUG', false);\n"
+      << "define('FORCE_SSL_ADMIN', false);\n" // ssl is enforced through other means
       << "if (!defined('ABSPATH'))\n"
       << "  define('ABSPATH', " << quoted(var_directory.string(), '\'') << ");\n"
       << "if (!defined('WP_CONTENT_DIR'))\n"

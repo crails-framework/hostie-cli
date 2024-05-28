@@ -64,15 +64,16 @@ string ConfigureSite::location_phpfpm_pass(const Location& location, bool ssl)
   ostringstream stream;
   stream
   << ind(1) "location " << location.path << " {" << endl
+  << ind(2) "index index.html index.htm index.php;" << endl
   << ind(2) "try_files $uri $uri/ /index.php$is_args$args;" << endl
-  << ind(1) '}' << endl << endl
-  << ind(1) "location ~ \\.php$ {" << endl
-  << ind(2) "fastcgi_pass unix:" << environment.get_variable("PHP_FPM_SOCKET") <<';' << endl
-  << ind(2) "fastcgi_index index.php;" << endl
-  << ind(2) "fastcgi_param App-Root " << location.target << ';' << endl
-  << ind(2) "fastcgi_param ABSPATH " << location.target << ';' << endl
-  << ind(2) "include fastcgi.conf;" << endl
+  << ind(2) "location ~ \\.php$ {" << endl
+  << ind(3) "fastcgi_pass unix:" << environment.get_variable("PHP_FPM_SOCKET") <<';' << endl
+  << ind(3) "fastcgi_index index.php;" << endl
+  << ind(3) "fastcgi_param App-Root " << location.target << ';' << endl
+  << ind(3) "fastcgi_param ABSPATH " << location.target << ';' << endl
+  << ind(3) "include fastcgi.conf;" << endl
   << location_custom_settings(location)
+  << ind(2) '}' << endl
   << ind(1) '}' << endl;
   return stream.str();
 }
