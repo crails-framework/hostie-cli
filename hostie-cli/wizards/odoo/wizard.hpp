@@ -5,8 +5,10 @@ namespace Odoo
 {
   class Wizard : public WizardBase
   {
-    HostieVariables store;
+    HostieVariables& store;
   public:
+    Wizard() : store(*HostieVariables::global) {}
+
     bool is_installed() const { return store.has_variable("odoo"); }
     int run()
     {
