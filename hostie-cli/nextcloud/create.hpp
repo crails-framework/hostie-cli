@@ -1,6 +1,5 @@
 #pragma once
 #include "../phpfpm_creator.hpp"
-#include <list>
 
 class InstanceUser;
 class MysqlDatabase;
@@ -31,7 +30,7 @@ namespace NextCloud
     bool install_nextcloud(const InstanceUser&, const MysqlDatabase&);
     bool post_install_nextcloud(const InstanceUser&);
     bool configure_overwrite_cli_url(const InstanceUser&, const std::string&);
-    bool configure_trusted_domains(const InstanceUser&, const std::list<std::string>&);
+    bool configure_trusted_domains(const InstanceUser&, const std::vector<std::string>&);
 
     bool run_occ_command(const InstanceUser&, const std::string&);
 

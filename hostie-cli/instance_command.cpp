@@ -1,4 +1,5 @@
 #include "instance_command.hpp"
+#include <crails/utils/split.hpp>
 #include <sstream>
 #include <cstdlib>
 #include <iostream>
@@ -39,5 +40,12 @@ int InstanceCommand::run_command_as_app_user(const std::string& command)
   return run_command_as(
     environment.get_variable("APPLICATION_USER"),
     command
+  );
+}
+
+vector<string> InstanceCommand::domain_names() const
+{
+  return Crails::split<string, vector<string>>(
+    environment.get_variable("HOSTIE_DOMAINS"), ';'
   );
 }

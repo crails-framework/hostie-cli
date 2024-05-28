@@ -19,4 +19,6 @@ public:
 
   int run_command_as(const std::string& user, const std::string& command);
   int run_command_as_app_user(const std::string& command);
+
+  std::vector<std::string> domain_names() const;
 };

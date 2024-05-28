@@ -27,13 +27,6 @@ bool DomainNameCommand::initialize(int argc, const char** argv)
   return false;
 }
 
-vector<string> DomainNameCommand::domain_names() const
-{
-  return Crails::split<string, vector<string>>(
-    environment.get_variable("HOSTIE_DOMAINS"), ';'
-  );
-}
-
 string DomainNameCommand::webmaster_email() const
 {
   return string();

@@ -1,5 +1,4 @@
 #include <crails/utils/random_string.hpp>
-#include <crails/utils/split.hpp>
 #include <crails/utils/semantics.hpp>
 #include <crails/cli/process.hpp>
 #include <crails/cli/with_path.hpp>
@@ -170,7 +169,7 @@ bool CreateCommand::install_nextcloud(const InstanceUser& user, const MysqlDatab
 
 bool CreateCommand::post_install_nextcloud(const InstanceUser& user)
 {
-  auto domains = Crails::split(environment.get_variable("HOSTIE_DOMAINS"), ';');
+  auto domains = domain_names();
   bool success = true;
 
   if (domains.size())
@@ -189,7 +188,7 @@ bool CreateCommand::configure_overwrite_cli_url(const InstanceUser& user, const 
   return run_occ_command(user, command.str());
 }
 
-bool CreateCommand::configure_trusted_domains(const InstanceUser& user, const list<string>& domains)
+bool CreateCommand::configure_trusted_domains(const InstanceUser& user, const vector<string>& domains)
 {
   int i = 0;
 
