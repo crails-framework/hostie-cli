@@ -30,6 +30,7 @@ int Wizard::run()
         string service_name = "php" + php_version() + "-fpm";
 
         HostieVariables::global->variable("php-fpm-service-name", service_name);
+        HostieVariables::global->save();
         Crails::run_command("systemctl enable " + service_name) && Crails::run_command("systemctl start " + service_name);
         return 0;
       }
