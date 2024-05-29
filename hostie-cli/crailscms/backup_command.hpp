@@ -13,7 +13,7 @@ namespace CrailsCms
       return "CrailsCMS";
     }
 
-    void append_add_backup_params(std::ostringstream& command) const override
+    void append_add_backup_params(Crails::ExecutableCommand& command) const override
     {
       using namespace std;
       string database_url = environment.get_variable("DATABASE_URL");
@@ -23,9 +23,9 @@ namespace CrailsCms
       if (options.count("schedule"))
         schedule = options["schedule"].as<string>();
       command
-        << "-d " << quoted(database_url)
-        << "-f " << var_directory
-        << "-s " << quoted(schedule);
+        << "-d" << database_url
+        << "-f" << var_directory
+        << "-s" << schedule;
     }
   };
 }

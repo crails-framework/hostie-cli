@@ -34,31 +34,29 @@ Crails::DatabaseUrl PostgresDatabase::get_url() const
   return url;
 }
 
-string PostgresDatabase::sql_query_command(const string_view query, const string_view database) const
+Crails::ExecutableCommand PostgresDatabase::sql_query_command(const string_view query, const string_view database) const
 {
-  stringstream command, su_command;
-
+  Crails::ExecutableCommand command;
   const string postgres_username = "postgres";
   const string postgres_password = HostieVariables::global->variable("postgres_root");
 
   setenv("PGPASSWORD", postgres_password.c_str(), 1);
   cout << "sql query: " << query << endl;
-  command << "psql"
-          << " -U " << postgres_username
-          << " -h " << hostname
-          << " -p " << port;
+  command.path = "psql";
+  command 
+          << "-U" << postgres_username
+          << "-h" << hostname
+          << "-p" << to_string(port);
   if (database.length() > 0)
-    command << " -d " << database;
-  command << " -tAc " << quoted(query);
-  cerr << "== " << command.str() << endl;
-  return command.str();
-  //su_command << "sudo -u postgres bash -c " << quoted(command.str());
-  //return su_command.str(); 
+    command << "-d" << database;
+  command << "-tAc" << query;
+  cerr << "== " << command << endl;
+  return command;
 }
 
 bool PostgresDatabase::run_query(const string_view query, const string_view database) const
 {
-  return std::system(sql_query_command(query, database).c_str()) == 0;
+  return Crails::run_command(sql_query_command(query, database));
 }
 
 bool PostgresDatabase::table_exists(const string_view name) const
@@ -71,12 +69,12 @@ bool PostgresDatabase::table_exists(const string_view name) const
 
 bool PostgresDatabase::user_exists() const
 {
-  stringstream command;
+  string output;
   string query = "SELECT 1 FROM pg_roles WHERE rolname='" + user + '\'';
 
-  command << sql_query_command(string_view(query))
-          << " | grep 1";
-  return std::system(command.str().c_str()) == 0;
+  if (Crails::run_command(sql_query_command(string_view(query)), output))
+    return output.find('1') != string::npos;
+  return false;
 }
 
 bool PostgresDatabase::prepare_user() const

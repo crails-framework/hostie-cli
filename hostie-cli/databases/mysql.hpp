@@ -2,6 +2,7 @@
 #include <string>
 #include <string_view>
 #include <crails/database_url.hpp>
+#include <crails/cli/process.hpp>
 
 struct MysqlDatabase
 {
@@ -21,8 +22,8 @@ struct MysqlDatabase
   bool prepare_database() const;
   bool drop_database() const;
 
-  bool run_query(const std::string_view) const;
+  bool run_query(const std::string_view, const std::string_view database = "") const;
 
 private:
-  std::string sql_query_command(const std::string_view) const;
+  Crails::ExecutableCommand sql_query_command(const std::string_view, const std::string_view database = "") const;
 };

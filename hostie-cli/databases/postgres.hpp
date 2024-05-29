@@ -2,6 +2,7 @@
 #include <string>
 #include <string_view>
 #include <crails/database_url.hpp>
+#include <crails/cli/process.hpp>
 
 struct PostgresDatabase
 {
@@ -24,5 +25,5 @@ struct PostgresDatabase
   bool table_exists(const std::string_view) const;
 
 private:
-  std::string sql_query_command(const std::string_view, const std::string_view database = "") const;
+  Crails::ExecutableCommand sql_query_command(const std::string_view, const std::string_view database = "") const;
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "live_instance_command.hpp"
+#include <crails/cli/process.hpp>
 
 class BackupCommand : public ::LiveInstanceCommand
 {
@@ -13,5 +14,5 @@ public:
   void options_description(boost::program_options::options_description& options) const override;
 
 protected:
-  virtual void append_add_backup_params(std::ostringstream& command) const = 0;
+  virtual void append_add_backup_params(Crails::ExecutableCommand& command) const = 0;
 };

@@ -34,37 +34,42 @@ Crails::DatabaseUrl MysqlDatabase::get_url() const
   return url;
 }
 
-string MysqlDatabase::sql_query_command(const string_view query) const
+Crails::ExecutableCommand MysqlDatabase::sql_query_command(const string_view query, const string_view db_name) const
 {
-  stringstream command, su_command;
+  Crails::ExecutableCommand command;
 
   const string mysql_username = "root";
   const string mysql_password = HostieVariables::global->variable("mysql_root");
 
   setenv("MYSQL_PWD", mysql_password.c_str(), 1);
+  command.path = "mysql";
+  command
+    << "-u" << mysql_username
+  //<< "-h" << hostname
+    << "-P" << to_string(port);
+  if (db_name.length())
+    command << "-D" << db_name;
+  command << "-e" << query;
   cout << "sql query: " << query << endl;
-  command << "mysql"
-          << " -u " << mysql_username
-        //<< " -h " << hostname
-          << " -P " << port
-          << " -e " << quoted(query);
-  cerr << "== " << command.str() << endl;
-  return command.str();
+  cerr << "== " << command << endl;
+  return command;
 }
 
-bool MysqlDatabase::run_query(const string_view query) const
+bool MysqlDatabase::run_query(const string_view query, const string_view db_name) const
 {
-  return std::system(sql_query_command(query).c_str()) == 0;
+  Crails::ExecutableCommand command = sql_query_command(query, db_name);
+
+  return Crails::run_command(command);
 }
 
 bool MysqlDatabase::user_exists() const
 {
-  stringstream command;
+  string output;
   string query = "SELECT COUNT(User) FROM mysql.user WHERE User='" + user + '\'';
 
-  command << sql_query_command(string_view(query))
-          << " | grep 1";
-  return std::system(command.str().c_str()) == 0;
+  if (Crails::run_command(sql_query_command(string_view(query)), output))
+    return output.find('1') != string::npos;
+  return false;
 }
 
 bool MysqlDatabase::prepare_user() const

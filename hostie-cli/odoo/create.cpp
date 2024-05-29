@@ -143,8 +143,7 @@ int CreateCommand::run()
       service.require() &&
       prepare_database(database))
   {
-    string var_directory_chown_2 = "chown " + service.app_user + ' ' + var_directory.string();
-    std::system(var_directory_chown_2.c_str());
+    Crails::run_command({"chown", {service.app_user, var_directory.string()}});
     if (service.reload_service_files() && service.start())
     {
       unsigned int attempts = 0;

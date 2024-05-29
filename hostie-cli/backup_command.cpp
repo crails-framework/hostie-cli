@@ -1,5 +1,4 @@
 #include "backup_command.hpp"
-#include <crails/cli/process.hpp>
 #include <sstream>
 #include <filesystem>
 
@@ -36,7 +35,7 @@ void BackupCommand::options_description(boost::program_options::options_descript
 int BackupCommand::run()
 {
   string action = "list";
-  ostringstream command;
+  Crails::ExecutableCommand command;
 
   if (options.count("action"))
     action = options["action"].as<string>();
@@ -45,10 +44,10 @@ int BackupCommand::run()
     cerr << "unknown action " << action << endl;
     return -1;
   }
-  command
-    << crails_backup_bin() << ' ' << action << ' '
-    << "-n " << quoted(environment.get_project_name());
+  command.path = crails_backup_bin();
+  command << action << "-n" << environment.get_project_name();
   if (action == "add")
     append_add_backup_params(command);
-  return std::system(command.str().c_str()) == 0;
+  cout << "== " << command << endl;
+  return Crails::run_command(command);
 }

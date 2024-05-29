@@ -1,5 +1,6 @@
 #include <crails/read_file.hpp>
 #include <crails/utils/join.hpp>
+#include <crails/cli/process.hpp>
 #include <sstream>
 #include <cstdlib>
 #include <iostream>
@@ -92,11 +93,14 @@ bool StandardCreator::prepare_runtime_directory(const InstanceUser& user)
 
   state += VarDirectoryCreated;
 
-  stringstream chown_command, chgrp_command;
-  chown_command << "chown -R " << user.name  << ' ' << var_directory;
-  chgrp_command << "chgrp -R " << user.group << ' ' << var_directory;
-  cout << "+ " << chown_command.str() << " && " << chgrp_command.str() << endl;
-  return system(chown_command.str().c_str()) == 0 && system(chgrp_command.str().c_str()) == 0;
+  Crails::ExecutableCommand chown_command{
+    "chown", {"-R", user.name, var_directory.string()}
+  };
+  Crails::ExecutableCommand chgrp_command{
+    "chgrp", {"-R", user.group, var_directory.string()}
+  };
+  cout << "+ " << chown_command << " && " << chgrp_command << endl;
+  return Crails::run_command(chown_command) && Crails::run_command(chgrp_command);
 }
 
 filesystem::path StandardCreator::get_log_directory() const
@@ -110,10 +114,8 @@ bool StandardCreator::prepare_log_directory(const SystemService& service)
 
   if (filesystem::is_directory(directory) || filesystem::create_directories(directory))
   {
-    string chown_command = "chown " + service.app_user + ' ' + directory.string();
-
     cerr << "using log directory: " << directory << endl;
-    if (std::system(chown_command.c_str()) != 0)
+    if (!Crails::run_command({"chown", {service.app_user, directory.string()}}))
     {
       cerr << "could not chown log directory " << directory << endl;
       return false;
