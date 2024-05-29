@@ -117,7 +117,7 @@ string ConfigureSite::location_redirect(const Location& location)
 string ConfigureSite::location_https_redirect(const Location& location)
 {
   return location_redirect(Location{
-    location.path, "https://$server_name$request_uri;"
+    location.path, "https://$server_name$request_uri"
   });
 }
 
@@ -267,10 +267,11 @@ int ConfigureSite::make_site()
     if (system("systemctl reload nginx") == 0)
       return 0;
     cerr << "failed to reload nginx" << endl;
+    return 11;
   }
   else
     cerr << "could not open " << site_conf_path() << endl;
-  return -1;
+  return 10;
 }
 
 int ConfigureSite::run()
@@ -280,7 +281,10 @@ int ConfigureSite::run()
   if (status == 0 && options.count("certify"))
   {
     if (!renew_certificates())
+    {
       cerr << "failed to renew certificates" << endl;
+      return 20;
+    }
   }
   return status;
 }
