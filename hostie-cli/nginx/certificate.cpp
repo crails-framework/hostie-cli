@@ -72,17 +72,18 @@ time_t CertificateCommand::certificate_expiry_time(const string_view domain_name
 bool CertificateCommand::renew_certificates() const
 {
   vector<string> certifiable_domain_names;
+  bool success;
 
   for (const string& domain_name : domain_names())
   {
     if (is_domain_certificate_renewable(domain_name))
       certifiable_domain_names.push_back(domain_name);
   }
-  if (renew_certificates_for(certifiable_domain_names))
-    return true;
-  else
+  success = certifiable_domain_names.size() == 0;
+  success = success || renew_certificates_for(certifiable_domain_names);
+  if (!success)
     cerr << "certbot: failed to certify domains" << endl;
-  return false;
+  return success;
 }
 
 bool CertificateCommand::renew_certificates_for(const vector<string>& domain_names) const
