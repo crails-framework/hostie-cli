@@ -9,18 +9,18 @@ extern bool sudo;
 
 bool InstanceUser::user_exists() const
 {
-  return Crails::run_command("id -u \"" + name + '"');
+  return Crails::run_command({"id", {"-u", name}});
 }
 
 bool InstanceUser::group_exists() const
 {
-  return Crails::run_command("grep \"^" + group + ":\" /etc/group");
+  return Crails::run_command({"grep", {'^' + group + ':', "/etc/group"}});
 }
 
 bool InstanceUser::delete_user()
 {
   if (user_exists())
-    return Crails::run_command("userdel \"" + name + '"');
+    return Crails::run_command({"userdel", {name}});
   return true;
 }
 
