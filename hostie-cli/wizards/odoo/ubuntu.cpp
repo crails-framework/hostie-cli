@@ -36,3 +36,9 @@ int Wizard::run()
   }
   return -1;
 }
+
+int Wizard_2404::run()
+{
+  requirements.push_back("python3-lxml-html-clean");
+  return Odoo::Ubuntu::Wizard::run();
+}

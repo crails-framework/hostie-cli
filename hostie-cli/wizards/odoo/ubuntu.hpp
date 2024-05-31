@@ -11,5 +11,11 @@ namespace Odoo
     public:
       int run();
     };
+
+    class Wizard_2404 : public Wizard
+    {
+    public:
+      int run();
+    };
   }
 }
