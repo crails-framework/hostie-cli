@@ -4,6 +4,7 @@
 #include <crails/pbkdf2_hmac.hpp>
 #include <crails/utils/base64.hpp>
 #include <iostream>
+#include <sstream>
 #include "create.hpp"
 #include "../service.hpp"
 #include "../user.hpp"
@@ -170,9 +171,13 @@ int CreateCommand::run()
 
 bool CreateCommand::update_admin_password(PostgresDatabase& database) const
 {
-  setenv("ODOO_ADMIN_LOGIN", default_admin_login().c_str(), 1);
-  setenv("ODOO_ADMIN_PASSWORD", encoded_admin_password.c_str(), 1);
-  return database.run_query("UPDATE res_users SET password='$ODOO_ADMIN_PASSWORD', login='$ODOO_ADMIN_LOGIN'  WHERE login='admin'", string_view(database.database_name));
+  ostringstream query;
+
+  query << "UPDATE res_users SET "
+        << "password=" << quoted(default_admin_login(), '\'') << ", "
+        << "login=" << quoted(encoded_admin_password, '\'') << ' '
+        << "WHERE login='admin'";
+  return database.run_query(query.str(), string_view(database.database_name));
 }
 
 bool CreateCommand::prepare_database(const PostgresDatabase& database)
