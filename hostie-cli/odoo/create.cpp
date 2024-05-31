@@ -174,8 +174,8 @@ bool CreateCommand::update_admin_password(PostgresDatabase& database) const
   ostringstream query;
 
   query << "UPDATE res_users SET "
-        << "password=" << quoted(default_admin_login(), '\'') << ", "
-        << "login=" << quoted(encoded_admin_password, '\'') << ' '
+        << "login=" << quoted(default_admin_login(), '\'') << ", "
+        << "password=" << quoted(encoded_admin_password, '\'') << ' '
         << "WHERE login='admin'";
   return database.run_query(query.str(), string_view(database.database_name));
 }
