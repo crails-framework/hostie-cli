@@ -1,1 +1,1 @@
-./: {*/ -build/} doc{README.md} manifest
+./: {*/ -build/ -docker/ -packages/} doc{README.md} manifest
