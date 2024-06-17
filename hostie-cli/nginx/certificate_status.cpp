@@ -27,8 +27,9 @@ int CertificateStatus::run()
     }
     else
     {
-      cout << "no certificate" << endl;
+      cout << "no certificate";
     }
+    cout << endl;
   }
   return 0;
 }
