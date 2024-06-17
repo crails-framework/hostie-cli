@@ -21,7 +21,7 @@ int CertificateStatus::run()
       else
       {
         cout << "certified, expires in: "
-             << (expiry_at - now / 60 / 60 / 24)
+             << ((expiry_at - now) / 60 / 60 / 24)
              << " days";
       }
     }
