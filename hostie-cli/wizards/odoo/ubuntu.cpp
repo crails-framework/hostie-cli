@@ -9,6 +9,11 @@ using namespace Odoo::Ubuntu;
 int Wizard::run()
 {
   requirements.push_back("odoo");
+  requirements.push_back("xfonts-75dpi");
+  UbuntuWizard::add_package_requirement(
+    "wkhtmltopdf",
+    "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.jammy_amd64.deb"
+  );
   if (Crails::require_command("curl") && require_wizard<UbuntuPostgresWizard>())
   {
     filesystem::path keyring_path("/usr/share/keyrings/odoo-archive-keyring.gpg");
@@ -40,5 +45,11 @@ int Wizard::run()
 int Wizard_2404::run()
 {
   requirements.push_back("python3-lxml-html-clean");
+  // wkhtmltopdf hasn't been released for Ubuntu 2404 yet
+  UbuntuWizard::add_package_requirement(
+    "wkhtmltopdf",
+    ""
+  );
+  requirements.push_back("wkhtmltopdf");
   return Odoo::Ubuntu::Wizard::run();
 }
