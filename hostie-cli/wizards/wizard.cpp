@@ -128,6 +128,41 @@ bool WizardBase::extract_source(const std::string_view url, const std::string_vi
   return false;
 }
 
+bool WizardBase::add_package_requirement(const string_view name, const string_view url)
+{
+  if (package_urls.find(name) == package_urls.end())
+  {
+    package_urls.emplace(name, url);
+    return true;
+  }
+  return false;
+}
+
+bool WizardBase::install_package_from_urls() const
+{
+  filesystem::path tmp_path("/tmp/dependency_package");
+
+  for (auto it = package_urls.begin() ; it != package_urls.end() ; ++it)
+  {
+    const string_view package_name = it->first;
+    const string_view package_url = it->second;
+
+    if (package_url.length() == 0)
+      continue ;
+    if (download_file(package_url, tmp_path))
+    {
+      stringstream command;
+
+      command << "dpkg -i " << tmp_path;
+      if (system(command.str().c_str()) == 0)
+        continue ;
+    }
+    cerr << "failed to install package " << package_name << endl;
+    return false;
+  }
+  return true;
+}
+
 bool WizardBase::apply_web_permissions(const filesystem::path& target) const
 {
   auto uid = Crails::uid_from_username(HostieVariables::global->variable("web-user"));

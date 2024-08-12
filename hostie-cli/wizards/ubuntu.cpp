@@ -10,5 +10,5 @@ bool UbuntuWizard::install_requirements()
   command << "apt-get install -y";
   for (const string_view package : requirements)
     command << ' ' << quoted(package);
-  return system(command.str().c_str()) == 0;
+  return system(command.str().c_str()) == 0 && install_package_from_urls();
 }
