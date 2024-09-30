@@ -70,6 +70,7 @@ bool CreateCommand::prepare_wordpress(const InstanceUser& user)
   filesystem::path wordpress_source = find_wordpress_source();
   filesystem::path wp_content_source = wordpress_source / "wp-content";
   filesystem::path wp_content_target = var_directory / "wp-content";
+  filesystem::path upload_folder = wp_content_target / "uploads";
 
   if (wordpress_source.empty())
   {
@@ -111,6 +112,10 @@ bool CreateCommand::prepare_wordpress(const InstanceUser& user)
         filesystem::create_hard_link(path, target_folder / path.filename());
     }
   }
+  // Creating upload folder
+  filesystem::create_directories(upload_folder);
+  Crails::chown(upload_folder, user.name);
+  Crails::chgrp(upload_folder, "www-data");
   return true;
 }
 
