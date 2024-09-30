@@ -1,5 +1,6 @@
 #pragma once
 #include "./instance_command.hpp"
+#include "./hostie_variables.hpp"
 #include <filesystem>
 
 class SystemService;

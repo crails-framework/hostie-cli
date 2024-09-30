@@ -67,10 +67,11 @@ filesystem::path CreateCommand::find_wordpress_source() const
 
 bool CreateCommand::prepare_wordpress(const InstanceUser& user)
 {
-  filesystem::path wordpress_source = find_wordpress_source();
-  filesystem::path wp_content_source = wordpress_source / "wp-content";
-  filesystem::path wp_content_target = var_directory / "wp-content";
-  filesystem::path upload_folder = wp_content_target / "uploads";
+  const filesystem::path wordpress_source = find_wordpress_source();
+  const filesystem::path wp_content_source = wordpress_source / "wp-content";
+  const filesystem::path wp_content_target = var_directory / "wp-content";
+  const filesystem::path upload_folder = wp_content_target / "uploads";
+  const string web_group = HostieVariables::global->variable_or("web-group", "www-data");
 
   if (wordpress_source.empty())
   {
@@ -96,12 +97,12 @@ bool CreateCommand::prepare_wordpress(const InstanceUser& user)
   filesystem::create_directory_symlink(wp_content_source / "languages", wp_content_target / "languages");
   for (const string& name : vector<string>{"plugins", "themes"})
   {
-    filesystem::path source_folder = wp_content_source / name;
-    filesystem::path target_folder = wp_content_target / name;
+    const filesystem::path source_folder = wp_content_source / name;
+    const filesystem::path target_folder = wp_content_target / name;
 
     filesystem::create_directories(target_folder);
     Crails::chown(target_folder, user.name);
-    Crails::chgrp(target_folder, "www-data");
+    Crails::chgrp(target_folder, web_group);
     for (const auto& entry : filesystem::directory_iterator(source_folder))
     {
       filesystem::path path = entry.path();
@@ -115,7 +116,7 @@ bool CreateCommand::prepare_wordpress(const InstanceUser& user)
   // Creating upload folder
   filesystem::create_directories(upload_folder);
   Crails::chown(upload_folder, user.name);
-  Crails::chgrp(upload_folder, "www-data");
+  Crails::chgrp(upload_folder, web_group);
   return true;
 }
 
