@@ -14,7 +14,7 @@ public:
   WordpressIndex()
   {
     using namespace Wordpress;
-    add_command("list", []() { return std::make_shared<ListWordpressCommand>(); });
+    add_command("list", []() { return std::make_shared<WpListCommand>(); });
     add_command("config", []() { return std::make_shared<EnvironmentCommand<Wordpress::LiveInstanceCommand>>(); });
     add_command("create", []() { return std::make_shared<CreateCommand>(); });
     add_command("remove", []() { return std::make_shared<RemoveCommand>(); });

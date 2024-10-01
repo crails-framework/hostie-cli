@@ -15,6 +15,8 @@ public:
     return true;
   }
 
+  virtual void display_entry(const std::filesystem::path& filepath) const;
+
   int run() override;
 
   static std::vector<std::filesystem::path> instance_environments();

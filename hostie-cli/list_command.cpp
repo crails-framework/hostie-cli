@@ -5,16 +5,19 @@
 
 using namespace std;
 
+void ListCommand::display_entry(const filesystem::path& filepath) const
+{
+  cout
+    << filepath.filename().replace_extension().string()
+    << endl;
+}
+
 int ListCommand::run()
 {
   for (const auto& filepath : instance_environments())
   {
     if (should_display_entry(filepath))
-    {
-      cout
-        << filepath.filename().replace_extension().string()
-        << endl;
-    }
+      display_entry(filepath);
   }
   return 0;
 }
