@@ -9,6 +9,8 @@
 #include <cstdlib>
 #include <iostream>
 #include "create.hpp"
+#include "folder_install.hpp"
+#include "version.hpp"
 #include "../user.hpp"
 #include "../databases/mysql.hpp"
 #include "../file_ownership.hpp"
@@ -24,6 +26,7 @@ int CreateCommand::run()
   {
     InstanceUser user;
     MysqlDatabase database;
+    const string wp_version = HostieVariables::global->variable_or("wordpress-version", WORDPRESS_DEFAULT_VERSION);
 
     user.name = options["user"].as<string>();
     user.group = HostieVariables::global->variable("web-group");
@@ -43,7 +46,9 @@ int CreateCommand::run()
       {"APPLICATION_USER",     user.name},
       {"APPLICATION_TYPE",     "Wordpress"},
       {"VAR_DIRECTORY",        var_directory.string()},
-      {"DATABASE_URL",         database.get_url().to_string()}
+      {"DATABASE_URL",         database.get_url().to_string()},
+      {"WORDPRESS_VERSION",    wp_version},
+      {"WORDPRESS_SRC",        find_wordpress_source().string()}
     });
 
     if (generate_wp_config(user, database) &&
@@ -67,57 +72,11 @@ filesystem::path CreateCommand::find_wordpress_source() const
 
 bool CreateCommand::prepare_wordpress(const InstanceUser& user)
 {
-  const filesystem::path wordpress_source = find_wordpress_source();
-  const filesystem::path wp_content_source = wordpress_source / "wp-content";
-  const filesystem::path wp_content_target = var_directory / "wp-content";
-  const filesystem::path upload_folder = wp_content_target / "uploads";
-  const string web_group = HostieVariables::global->variable_or("web-group", "www-data");
-
-  if (wordpress_source.empty())
-  {
-    cerr << "wordpress source not found" << endl;
-    return false;
-  }
-  // Linking root directories
-  for (const auto& entry : filesystem::directory_iterator(wordpress_source))
-  {
-    filesystem::path path = entry.path();
-
-    if (filesystem::is_directory(path))
-    {
-      if (filesystem::equivalent(path, wp_content_source)) continue;
-      filesystem::create_directory_symlink(path, var_directory / path.filename());
-    }
-    else if (path.filename() != "wp-config.php")
-      filesystem::create_hard_link(path, var_directory / path.filename());
-  }
-  // Creating wp-content
-  filesystem::create_directories(wp_content_target);
-  filesystem::create_hard_link        (wp_content_source / "index.php", wp_content_target / "index.php");
-  filesystem::create_directory_symlink(wp_content_source / "languages", wp_content_target / "languages");
-  for (const string& name : vector<string>{"plugins", "themes"})
-  {
-    const filesystem::path source_folder = wp_content_source / name;
-    const filesystem::path target_folder = wp_content_target / name;
-
-    filesystem::create_directories(target_folder);
-    Crails::chown(target_folder, user.name);
-    Crails::chgrp(target_folder, web_group);
-    for (const auto& entry : filesystem::directory_iterator(source_folder))
-    {
-      filesystem::path path = entry.path();
-
-      if (filesystem::is_directory(path))
-        filesystem::create_directory_symlink(path, target_folder / path.filename());
-      else
-        filesystem::create_hard_link(path, target_folder / path.filename());
-    }
-  }
-  // Creating upload folder
-  filesystem::create_directories(upload_folder);
-  Crails::chown(upload_folder, user.name);
-  Crails::chgrp(upload_folder, web_group);
-  return true;
+  return FolderInstaller{
+    user,
+    var_directory,
+    find_wordpress_source()
+  }.install();
 }
 
 bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlDatabase& database)
