@@ -2,6 +2,7 @@
 #include "folder_install.hpp"
 #include "../user.hpp"
 #include "../hostie_variables.hpp"
+#include "../phpfpm_creator.hpp"
 
 using namespace std;
 using namespace Wordpress;
@@ -44,6 +45,7 @@ int MigrateVersionCommand::run()
     {
       environment.set_variable("WORDPRESS_VERSION", target_version);
       environment.save();
+      PhpFpmCreator::restart_php_fpm();
       return 0;
     }
     return 1;
