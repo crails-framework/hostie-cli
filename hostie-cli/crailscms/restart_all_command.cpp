@@ -9,14 +9,14 @@ using namespace std;
 vector<filesystem::path> RestartAllCommand::collect_environments() const
 {
   auto environments = ListCommand::instance_environments();
+  vector<filesystem::path> result;
 
-  environments.erase(
-    remove_if(environments.begin(), environments.end(), [](const filesystem::path& filepath)
-    {
-      return !ListCommand::has_environment_type(filepath, "CrailsCMS");
-    })
+  copy_if(
+    environments.begin(), environments.end(),
+    back_inserter(result), 
+    [](const filesystem::path& filepath) { return ListCommand::has_environment_type(filepath, "CrailsCMS"); }
   );
-  return environments;
+  return result;
 }
 
 void RestartAllCommand::restart_services(const vector<filesystem::path>& environments) const
