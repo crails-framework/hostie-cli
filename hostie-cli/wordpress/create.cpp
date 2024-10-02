@@ -88,26 +88,31 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
     "AUTH_KEY", "SECURE_AUTH_KEY", "LOGGED_IN_KEY", "NONCE_KEY", "AUTH_SALT",
     "SECURE_AUTH_SALT", "LOGGED_IN_SALT", "NONCE_SALT"
   };
+  const string table_prefix = Crails::generate_random_string("abcdefghijklmnopqrstuvwxyz", 5);
 
   if (stream.is_open())
   {
     stream
       << "<?php\n"
+      << "@ini_set('display_errors', 0)\n"
       << "define('DB_NAME', " << quoted(database_url.database_name, '\'') << ");\n"
       << "define('DB_USER', " << quoted(database_url.username, '\'') << ");\n"
       << "define('DB_PASSWORD', " << quoted(database_url.password, '\'') << ");\n"
       << "define('DB_HOST', " << quoted(database.hostname, '\'') << ");\n";
     stream
       << "define('DB_CHARSET', 'utf8');\n"
-      << "define('DB_COLLATE', '');\n";
+      << "define('DB_COLLATE', '');\n"
+      << "define('COOKIEHASH', md5(" << quoted(Crails::generate_random_string(16), '\'') << ");\n";
     for (const auto& key : secret_keys)
     {
       stream
-        << "define('" << key << "', " << quoted(Crails::generate_random_string(32), '\'') << ");\n";
+        << "define('" << key << "', " << quoted(Crails::generate_random_string(64), '\'') << ");\n";
     }
     stream
-      << "$table_prefix = 'wp_';\n"
+      << "$table_prefix = '" << table_prefix << "_';\n"
+      << "define('DISALLOW_FILE_EDIT', true);\n"
       << "define('WP_DEBUG', false);\n"
+      << "define('WP_DEBUG_DISPLAY', false)\n"
       << "define('FORCE_SSL_ADMIN', false);\n" // ssl is enforced through other means
       << "if (!defined('ABSPATH'))\n"
       << "  define('ABSPATH', " << quoted(var_directory.string(), '\'') << ");\n"
@@ -118,8 +123,7 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
     Crails::chown(path, user.name);
     Crails::chgrp(path, HostieVariables::global->variable("web-group"));
     filesystem::permissions(path,
-      filesystem::perms::owner_read | filesystem::perms::group_read |
-      filesystem::perms::owner_exec | filesystem::perms::group_exec,
+      filesystem::perms::owner_read | filesystem::perms::group_read,
       filesystem::perm_options::replace);
     return true;
   }
