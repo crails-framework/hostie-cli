@@ -96,10 +96,14 @@ bool Wizard::download_wordpress()
 
   if (extract_source(wordpress_url, "wordpress", target))
   {
+    filesystem::remove(target / "wp-config-sample.php");
     for (const string& language : wordpress_languages())
       download_language(*this, target, language, version);
     if (Crails::write_file("wordpress-installer", (target / "wp-config.php").string(), wp_config_src))
     {
+      filesystem::permissions(target / "wp-config.php",
+        filesystem::perms::owner_read | filesystem::perms::group_read,
+        filesystem::perm_options::replace);
       HostieVariables::global->variable("wordpress-version", version);
       HostieVariables::global->variable("wordpress-source", target.string());
       HostieVariables::global->save();
