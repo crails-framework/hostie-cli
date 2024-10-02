@@ -7,6 +7,7 @@
 #include "backup_command.hpp"
 #include "restore_command.hpp"
 #include "upgrade.hpp"
+#include "plugin.hpp"
 
 class WordpressIndex : public Crails::CommandIndex
 {
@@ -21,5 +22,6 @@ public:
     add_command("upgrade", []() { return std::make_shared<Wordpress::MigrateVersionCommand>(); });
     add_command("backup", []() { return std::make_shared<Wordpress::BackupCommand>(); });
     add_command("restore", []() { return std::make_shared<Wordpress::RestoreCommand>(); });
+    add_command("plugin", []() { return std::make_shared<Wordpress::PluginCommand>(); });
   }
 };
