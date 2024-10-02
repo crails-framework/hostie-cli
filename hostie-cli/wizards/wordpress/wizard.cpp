@@ -61,7 +61,7 @@ static string wordpress_url_for(const string& version)
 
 static string wordpress_language_url_for(const string& language, const string& version)
 {
-  return "https://downloads.wordpress.org/translations/core/"
+  return "https://downloads.wordpress.org/translation/core/"
         + version + '/' + language + ".zip";
 }
 

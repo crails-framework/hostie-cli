@@ -17,7 +17,7 @@ filesystem::path PluginCommand::wordpress_source() const
 {
   if (options.count("version"))
     return find_wordpress_source(options["version"].as<string>());
-  return HostieVariables::global->variable("wordpress-src");
+  return HostieVariables::global->variable("wordpress-source");
 }
 
 filesystem::path PluginCommand::plugin_path() const
