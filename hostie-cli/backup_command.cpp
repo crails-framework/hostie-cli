@@ -48,6 +48,5 @@ int BackupCommand::run()
   command << action << "-n" << environment.get_project_name();
   if (action == "add")
     append_add_backup_params(command);
-  cout << "== " << command << endl;
   return Crails::run_command(command);
 }
