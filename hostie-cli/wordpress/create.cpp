@@ -94,7 +94,7 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
   {
     stream
       << "<?php\n"
-      << "@ini_set('display_errors', 0)\n"
+      << "@ini_set('display_errors', 0);\n"
       << "define('DB_NAME', " << quoted(database_url.database_name, '\'') << ");\n"
       << "define('DB_USER', " << quoted(database_url.username, '\'') << ");\n"
       << "define('DB_PASSWORD', " << quoted(database_url.password, '\'') << ");\n"
@@ -102,7 +102,7 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
     stream
       << "define('DB_CHARSET', 'utf8');\n"
       << "define('DB_COLLATE', '');\n"
-      << "define('COOKIEHASH', md5(" << quoted(Crails::generate_random_string(16), '\'') << ");\n";
+      << "define('COOKIEHASH', md5(" << quoted(Crails::generate_random_string(16), '\'') << "));\n";
     for (const auto& key : secret_keys)
     {
       stream
@@ -112,7 +112,7 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
       << "$table_prefix = '" << table_prefix << "_';\n"
       << "define('DISALLOW_FILE_EDIT', true);\n"
       << "define('WP_DEBUG', false);\n"
-      << "define('WP_DEBUG_DISPLAY', false)\n"
+      << "define('WP_DEBUG_DISPLAY', false);\n"
       << "define('FORCE_SSL_ADMIN', false);\n" // ssl is enforced through other means
       << "if (!defined('ABSPATH'))\n"
       << "  define('ABSPATH', " << quoted(var_directory.string(), '\'') << ");\n"
