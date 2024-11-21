@@ -38,7 +38,8 @@ void CreateCommand::options_description(boost::program_options::options_descript
 {
   StandardCreator::options_description(options);
   options.add_options()
-    ("gevent-port,q", boost::program_options::value<unsigned short>(), "network port to use for long polling");
+    ("gevent-port,q", boost::program_options::value<unsigned short>(), "network port to use for long polling")
+    ("without-demo", "disable demo data for modules");
 }
 
 unsigned short CreateCommand::gevent_port() const
@@ -64,7 +65,7 @@ bool CreateCommand::generate_odoo_conf(const PostgresDatabase& database)
     << "db_password = " << database.password << '\n'
     << "list_db = False\n"
     << "default_productivity_apps = True\n"
-    << "without_demo = False\n"
+    << "without_demo = " << (options.count("without-demo") ? "True" : "False") << '\n'
     << "admin_passwd = " << encoded_admin_password << '\n'
     << "db_filter = ^" << database.database_name << "$\n";
   return Crails::write_file("odoo", odoo_rc_path().string(), stream.str());
@@ -158,7 +159,7 @@ int CreateCommand::run()
       if (attempts < 10)
       {
         cerr << "updated admin password" << endl;
-        setup_base_url();
+        setup_base_url(database);
         return 0;
       }
       return 3;
@@ -191,7 +192,7 @@ bool CreateCommand::prepare_database(const PostgresDatabase& database)
   return false;
 }
 
-bool CreateCommand::setup_base_url() const
+bool CreateCommand::setup_base_url(PostgresDatabase& database) const
 {
   bool success = options.count("domains");
 
@@ -200,12 +201,13 @@ bool CreateCommand::setup_base_url() const
     const string url = *(options["domains"].as<vector<string>>().begin());
     ostringstream update_query, freeze_query;
 
-    query << "UPDATE ir_config_parameter SET value=" << quoted(url, '\'')
+    update_query
+          << "UPDATE ir_config_parameter SET value=" << quoted(url, '\'')
           << " WHERE key='web.base.url'";
     freeze_query
           << "INSERT INTO ir_config_parameter(create_uid,write_uid,key,value)"
           << " VALUES(1,1,'web.base.url.freeze','True')";
-    success = database.run_query(query.str(), string_view(database.database_name))
+    success = database.run_query(update_query.str(), string_view(database.database_name))
            && database.run_query(freeze_query.str(), string_view(database.database_name));
     if (!success)
       cerr << "Failed to set ir_config_parameter web.base.url" << endl;
