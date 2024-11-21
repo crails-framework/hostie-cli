@@ -10,6 +10,10 @@ int Wizard::run()
 {
   requirements.push_back("odoo");
   requirements.push_back("xfonts-75dpi");
+  requirements.push_back("python3-pdfminer");
+  requirements.push_back("python3-asn1crypto");
+  requirements.push_back("python3-cbor2");
+  requirements.push_back("python3-openpyxl");
   UbuntuWizard::add_package_requirement(
     "wkhtmltopdf",
     "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.jammy_amd64.deb"
