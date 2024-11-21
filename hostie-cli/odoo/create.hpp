@@ -22,6 +22,7 @@ namespace Odoo
     std::string start_command(const std::filesystem::path& bin, const PostgresDatabase&) const;
     void initialize_admin_password(const std::string& password);
     bool update_admin_password(PostgresDatabase&) const;
+    bool setup_base_url() const;
     unsigned short gevent_port() const;
 
   private:

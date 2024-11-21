@@ -158,6 +158,7 @@ int CreateCommand::run()
       if (attempts < 10)
       {
         cerr << "updated admin password" << endl;
+        setup_base_url();
         return 0;
       }
       return 3;
@@ -188,6 +189,30 @@ bool CreateCommand::prepare_database(const PostgresDatabase& database)
     return true;
   }
   return false;
+}
+
+bool CreateCommand::setup_base_url() const
+{
+  bool success = options.count("domains");
+
+  if (success)
+  {
+    const string url = *(options["domains"].as<vector<string>>().begin());
+    ostringstream update_query, freeze_query;
+
+    query << "UPDATE ir_config_parameter SET value=" << quoted(url, '\'')
+          << " WHERE key='web.base.url'";
+    freeze_query
+          << "INSERT INTO ir_config_parameter(create_uid,write_uid,key,value)"
+          << " VALUES(1,1,'web.base.url.freeze','True')";
+    success = database.run_query(query.str(), string_view(database.database_name))
+           && database.run_query(freeze_query.str(), string_view(database.database_name));
+    if (!success)
+      cerr << "Failed to set ir_config_parameter web.base.url" << endl;
+  }
+  else
+    cerr << "No domains specified: ir_config_parameter web.base.url won't be initialized" << endl;
+  return success;
 }
 
 int CreateCommand::cancel(InstanceUser& user, PostgresDatabase& database)
