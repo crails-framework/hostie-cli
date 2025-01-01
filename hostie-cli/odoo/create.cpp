@@ -58,6 +58,7 @@ bool CreateCommand::generate_odoo_conf(const PostgresDatabase& database)
     << "http_interface = 127.0.0.1\n" // only reachable to the local nginx instance
     << "http_port = " << options["port"].as<unsigned short>() << '\n'
     << "gevent_port = " << gevent_port() << '\n'
+    << "proxy_mode = True\n"
     << "data_dir = " << var_directory.string() << '\n'
     << "logfile = " << (get_log_directory() / "server.log").string() << '\n'
     << "db_host = localhost\n"
