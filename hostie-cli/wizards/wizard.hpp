@@ -13,6 +13,9 @@ public:
   bool extract_source(const std::string_view url, const std::string_view target_name, const std::filesystem::path& target) const;
   bool install_package_from_urls() const;
   bool apply_web_permissions(const std::filesystem::path& target) const;
+  bool checksum(const std::string_view command, const std::filesystem::path&, const std::string_view hash);
+  bool checksum_sha256(const std::filesystem::path&, const std::string_view sha256_sum);
+  bool gpg_dearmor(const std::filesystem::path& source, const std::filesystem::path& output);
 
   template<typename WIZARD>
   static bool require_wizard()

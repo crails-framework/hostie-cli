@@ -196,3 +196,47 @@ bool WizardBase::apply_web_permissions(const filesystem::path& target) const
   }
   return true;
 }
+
+bool WizardBase::checksum(const string_view command, const filesystem::path& filepath, const string_view hash)
+{
+  Crails::ExecutableCommand sum_command(
+    {string(command), vector<string>{filepath.string()}}
+  );
+  string result;
+
+  if (Crails::run_command(sum_command, result))
+  {
+    const string_view verify_sum = string_view(
+      result.c_str(), result.find(' ')
+    );
+
+    if (hash == verify_sum)
+      return true;
+    else
+    {
+      cerr << "failed to verify sum for " << filepath << endl
+            << "\tExpected: " << hash << endl
+            << "\tReceived: " << verify_sum << endl;
+    }
+  }
+  else
+    cerr << "failed to read sum for " << filepath << endl;
+  return false;
+}
+
+bool WizardBase::checksum_sha256(const filesystem::path& filepath, const string_view sha256_sum)
+{
+  return checksum("sha256sum", filepath, sha256_sum);
+}
+
+bool WizardBase::gpg_dearmor(const filesystem::path& source, const filesystem::path& output)
+{
+  ostringstream command;
+
+  command << "cat " << source << " | gpg --dearmor | tee " << output;
+  if (system(command.str().c_str()) == 0)
+    return true;
+  else
+    cerr << "failed to run gpg --dearmor on " << source << endl;
+  return false;
+}
