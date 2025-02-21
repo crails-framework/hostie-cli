@@ -1,6 +1,7 @@
 #include "domain_name.hpp"
 #include <crails/utils/semantics.hpp>
 #include <crails/utils/split.hpp>
+#include <cstdlib>
 
 using namespace std;
 using namespace Nginx;
@@ -29,7 +30,15 @@ bool DomainNameCommand::initialize(int argc, const char** argv)
 
 string DomainNameCommand::webmaster_email() const
 {
-  return string();
+  string value = environment.get_variable("WEBMASTER_EMAIL");
+
+  if (value.length() == 0)
+  {
+    const char* env_variable = std::getenv("WEBMASTER_EMAIL");
+    if (env_variable)
+      value = string(env_variable);
+  }
+  return value;
 }
 
 filesystem::path DomainNameCommand::site_conf_path() const
