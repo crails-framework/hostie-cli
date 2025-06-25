@@ -25,7 +25,7 @@ bool CreateCommand::initialize(int argc, const char** argv)
     cerr << "CrailsCMS not installed: missing crailscms-bin-path property from rc file." << endl;
   return false;
 }
-  
+
 int CreateCommand::run()
 {
   const char* share_path = getenv("SHARE_PATH");
@@ -39,12 +39,14 @@ int CreateCommand::run()
     return -1;
   }
 
-  user.name = service.app_user = options["user"].as<string>();
-  user.group = service.app_group = options["group"].as<string>();
+  if (!load_user(user, options))
+    return -1;
 
   if (!create_user(user) || !prepare_runtime_directory(user))
     return cancel(user, database);
 
+  service.app_user = user.name;
+  service.app_group = user.group;
   service.app_name = options["name"].as<string>();
   service.start_command = (crailscms_bin_dir / "start.sh").string();
   service.stop_command = (crailscms_bin_dir / "stop.sh").string();

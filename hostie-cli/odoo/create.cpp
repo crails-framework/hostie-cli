@@ -99,8 +99,8 @@ int CreateCommand::run()
   SystemService service;
   filesystem::path odoo_bin_path = find_odoo_bin();
 
-  user.name = service.app_user = options["user"].as<string>();
-  user.group = service.app_group = options["group"].as<string>();
+  if (!load_user(user, options))
+    return -1;
 
   if (!filesystem::exists(odoo_bin_path))
   {
@@ -122,6 +122,8 @@ int CreateCommand::run()
     PostgresDatabase::password_charset, 32
   );
 
+  service.app_user = user.name;
+  service.app_group = user.group;
   service.app_name = options["name"].as<string>();
   service.start_command = start_command(odoo_bin_path, database);
   service.runtime_directory = var_directory;

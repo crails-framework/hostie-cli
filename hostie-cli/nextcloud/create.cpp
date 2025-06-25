@@ -20,7 +20,8 @@ int CreateCommand::run()
     InstanceUser user;
     MysqlDatabase database;
 
-    user.name = options["user"].as<string>();
+    if (!load_user(user, options))
+      return -1;
     user.group = HostieVariables::global->variable("web-group");
     database.user = user.name;
     database.database_name = options["name"].as<string>();

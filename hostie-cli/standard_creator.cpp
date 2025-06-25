@@ -140,6 +140,19 @@ bool StandardCreator::create_user(InstanceUser& user)
   return false;
 }
 
+bool StandardCreator::load_user(InstanceUser& user, const boost::program_options::options_description& options)
+{
+  if (options.count("user"))
+    user.name = options["user"].as<string>();
+  else
+    user.name = options["name"].as<string>();
+  if (options.count("group"))
+    user.group = options["group"].as<string>();
+  else
+    user.group = user.name;
+  return true;
+}
+
 string StandardCreator::default_admin_login() const
 {
   return HostieVariables::global->variable_or("default-admin-login", "admin");
