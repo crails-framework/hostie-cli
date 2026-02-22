@@ -9,6 +9,7 @@ namespace Nginx
     std::string location_phpfpm_pass(const HttpServer::Location&, bool ssl);
     std::string location_proxy_pass(const HttpServer::Location&, bool ssl);
     std::string location_custom_pass(const HttpServer::Location&, bool ssl);
+    std::string location_forbidden(const HttpServer::Location&);
     std::string location_redirect(const HttpServer::Location&);
     std::string server_locations(bool ssl, bool certified);
     std::string location_https_redirect(const HttpServer::Location&);

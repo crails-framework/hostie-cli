@@ -20,6 +20,7 @@ namespace HttpServer
     AppProxyLocation,
     PhpFpmLocation,
     RedirectLocation,
+    ForbiddenLocation,
     CustomLocation
   };
 
