@@ -108,9 +108,7 @@ string ConfigureSite::location_forbidden(const Location& location)
   ostringstream stream;
 
   stream
-  << ind(1) "location" << location.path << '{' << endl
-  << ind(2) "return 403;" << endl
-  << ind(1) '}' << endl;
+  << ind(1) "location" << location.path << "{ deny all; return 403; }" << endl;
   return stream.str();
 }
 
@@ -164,7 +162,7 @@ string ConfigureSite::server_locations(bool ssl, bool certified)
         stream << location_redirect(location);
         break ;
       case ForbiddenLocation:
-        stream << forbidden_location(location, ssl);
+        stream << location_forbidden(location, ssl);
         break ;
       case CustomLocation:
         stream << location_custom_pass(location, ssl);

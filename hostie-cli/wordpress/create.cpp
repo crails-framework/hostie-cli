@@ -87,7 +87,8 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
   Crails::DatabaseUrl database_url = database.get_url();
   vector<string> secret_keys{
     "AUTH_KEY", "SECURE_AUTH_KEY", "LOGGED_IN_KEY", "NONCE_KEY", "AUTH_SALT",
-    "SECURE_AUTH_SALT", "LOGGED_IN_SALT", "NONCE_SALT"
+    "SECURE_AUTH_SALT", "LOGGED_IN_SALT", "NONCE_SALT",
+    "SECRET_KEY", "SECRET_SALT"
   };
   const string table_prefix = Crails::generate_random_string("abcdefghijklmnopqrstuvwxyz", 5);
 
@@ -114,6 +115,11 @@ bool CreateCommand::generate_wp_config(const InstanceUser& user, const MysqlData
       << "define('DISALLOW_FILE_EDIT', true);\n"
       << "define('WP_DEBUG', false);\n"
       << "define('WP_DEBUG_DISPLAY', false);\n"
+      << "define('WP_ALLOW_REPAIR', false);\n"
+      << "define('DIEONDBERROR', false);\n"
+      << "define('ALLOW_UNFILTERED_UPLOADS', false);\n"
+      << "define('RELOCATE', false);\n"
+      << "define('CONCATENATE_SCRIPTS', false);\n"
       << "define('FORCE_SSL_ADMIN', false);\n" // ssl is enforced through other means
       << "if (!defined('ABSPATH'))\n"
       << "  define('ABSPATH', " << quoted(var_directory.string(), '\'') << ");\n"

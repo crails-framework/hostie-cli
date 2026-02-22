@@ -17,6 +17,20 @@ using namespace Wordpress;
 static const string wp_config_src = 
   "<?php require_once($_SERVER[\"App-Root\"] . \"/wp-config.php\"); ?>";
 
+static const string wp_must_use_plugin_src =
+  "<?php\n"
+  "remove_action('wp_head', 'wp_generator');\n"
+  "add_filter('the_generator', '__return_empty_string');\n"
+  "function remove_version_query_strings($src) {\n"
+  "  if (strpos($src, 'ver=')) {\n"
+  "      $src = remove_query_arg('ver', $src);\n"
+  "  }\n"
+  "  return $src;\n"
+  "}\n"
+  "add_filter('style_loader_src', 'remove_version_query_strings', 999);\n"
+  "add_filter('script_loader_src', 'remove_version_query_strings', 999);\n"
+  "?>";
+
 static string find_latest_version(const WizardBase& wizard)
 {
   const string_view error_message = "failed to determine latest version of Wordpress";
@@ -96,12 +110,18 @@ bool Wizard::download_wordpress()
 
   if (extract_source(wordpress_url, "wordpress", target))
   {
+    const filesystem::path wp_config_path = target / "wp-config.php";
+    const filesystem::path wp_mu_plugin_path = target / "wp-content" / "mu-plugins" / "hostie.php";
+
     filesystem::remove(target / "wp-config-sample.php");
+    filesystem::remove(target / "readme.html");
     for (const string& language : wordpress_languages())
       download_language(*this, target, language, version);
-    if (Crails::write_file("wordpress-installer", (target / "wp-config.php").string(), wp_config_src))
+    filesystem::create_directories(wp_mu_plugin_path.parent_path());
+    if (Crails::write_file("wordpress-installer", wp_config_path.string(), wp_config_src)
+    && (Crails::write_file("wordpress-installer", wp_mu_plugin_path.string(), wp_must_use_plugin_src))
     {
-      filesystem::permissions(target / "wp-config.php",
+      filesystem::permissions(wp_config_path,
         filesystem::perms::owner_read | filesystem::perms::group_read,
         filesystem::perm_options::replace);
       HostieVariables::global->variable("wordpress-version", version);
@@ -113,7 +133,7 @@ bool Wizard::download_wordpress()
         cerr << "Failed to apply proper permissions on " << target << endl;
     }
     else
-      cerr << "Failed to overwrite wp-config.php" << endl;
+      cerr << "Failed to generate custom php files (wp-config.php or mu-plugins/hostie.php)" << endl;
   }
   return false;
 }

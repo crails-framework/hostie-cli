@@ -73,8 +73,9 @@ void FolderInstaller::linking_root_directories() const
 void FolderInstaller::create_wp_content() const
 {
   create_directories(wp_content_target());
-  create_hard_link        (wp_content_source() / "index.php", wp_content_target() / "index.php");
-  create_directory_symlink(wp_content_source() / "languages", wp_content_target() / "languages");
+  create_hard_link        (wp_content_source() / "index.php",  wp_content_target() / "index.php");
+  create_directory_symlink(wp_content_source() / "languages",  wp_content_target() / "languages");
+  create_directory_symlink(wp_content_source() / "mu-plugins", wp_content_target() / "mu-plugins");
   for (const string& name : vector<string>{"plugins", "themes"})
   {
     const filesystem::path source_folder = wp_content_source() / name;
