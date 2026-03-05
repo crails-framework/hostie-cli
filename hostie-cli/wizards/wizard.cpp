@@ -2,7 +2,6 @@
 #include "../file_ownership.hpp"
 #include <crails/cli/process.hpp>
 #include <crails/cli/filesystem.hpp>
-#include <boost/process.hpp>
 #include <iostream>
 
 using namespace std;
@@ -53,9 +52,7 @@ bool WizardBase::download_file(const string_view url, const filesystem::path& ta
   download_command << "curl"
     << " -o " << target
     << " -L " << quoted(url);
-  boost::process::child download_process(download_command.str());
-  download_process.wait();
-  return download_process.exit_code() == 0;
+  return Crails::run_command(download_command.str());
 }
 
 bool WizardBase::download_tar_archive(const string_view url) const
@@ -68,12 +65,12 @@ bool WizardBase::download_tar_archive(const string_view url) const
     if (download_file(url, tmp_filepath))
     {
       stringstream extract_command;
+      bool success;
 
       extract_command << "tar xf " << tmp_filepath;
-      boost::process::child extract_process(extract_command.str());
-      extract_process.wait();
+      success = Crails::run_command(extract_command.str());
       filesystem::remove(tmp_filepath);
-      if (extract_process.exit_code() == 0)
+      if (success)
         return true;
       else
         cerr << "failed to extract " << url << endl;
@@ -94,12 +91,12 @@ bool WizardBase::download_zip_archive(const string_view url) const
     if (download_file(url, tmp_filepath))
     {
       stringstream extract_command;
+      bool success;
 
       extract_command << "unzip " << tmp_filepath;
-      boost::process::child extract_process(extract_command.str());
-      extract_process.wait();
+      success = Crails::run_command(extract_command.str());
       filesystem::remove(tmp_filepath);
-      if (extract_process.exit_code() == 0)
+      if (success)
         return true;
       else
         cerr << "failed to extract " << url << endl;

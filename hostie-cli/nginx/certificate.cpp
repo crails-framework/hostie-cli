@@ -1,5 +1,5 @@
 #include "certificate.hpp"
-#include <boost/process.hpp>
+#include <crails/cli/process.hpp>
 #include <ctime>
 #include <iomanip>
 #include <sstream>
@@ -10,18 +10,14 @@ using namespace Nginx;
 
 static string get_certificate_expiry_date_string(const string_view domain_name)                                  
 { 
-  filesystem::path fullchain_path = CertificateCommand::certificate_directory(domain_name) / "fullchain.pem";                             
+  filesystem::path fullchain_path = CertificateCommand::certificate_directory(domain_name) / "fullchain.pem";
   stringstream command_stream;                                                                                        
+  string output;
+
   command_stream
     << "openssl x509 -enddate -noout -in "                                                                            
     << quoted(fullchain_path.string());                                                                               
-  boost::process::ipstream stream;
-  boost::process::child process(command_stream.str(),                                                                 
-    boost::process::std_out > stream                                                                                  
-  );
-  string output;
-  
-  if (process.running() && getline(stream, output))                                                                   
+  if (Crails::run_command(command_stream.str(), output))
   {                                                                                                                   
     std::size_t position = output.find('=');
 
