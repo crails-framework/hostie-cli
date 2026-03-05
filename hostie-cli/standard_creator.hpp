@@ -35,7 +35,7 @@ public:
   virtual bool prepare_log_directory(const SystemService&);
   virtual std::filesystem::path get_log_directory() const;
   virtual bool create_user(InstanceUser& user);
-  static  bool load_user(InstanceUser& user, const boost::program_options::options_description& options);
+  static  bool load_user(InstanceUser& user, const boost::program_options::variables_map& options);
 
   std::string default_admin_login() const;
   std::string default_admin_password() const;

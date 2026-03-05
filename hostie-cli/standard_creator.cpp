@@ -140,7 +140,7 @@ bool StandardCreator::create_user(InstanceUser& user)
   return false;
 }
 
-bool StandardCreator::load_user(InstanceUser& user, const boost::program_options::options_description& options)
+bool StandardCreator::load_user(InstanceUser& user, const boost::program_options::variables_map& options)
 {
   if (options.count("user"))
     user.name = options["user"].as<string>();
