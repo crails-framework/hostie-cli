@@ -2,6 +2,7 @@
 #include "../file_ownership.hpp"
 #include <crails/cli/process.hpp>
 #include <crails/cli/filesystem.hpp>
+#include <sstream>
 #include <iostream>
 
 using namespace std;

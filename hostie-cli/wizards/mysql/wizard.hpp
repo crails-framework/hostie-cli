@@ -1,6 +1,7 @@
 #pragma once
 #include <crails/utils/random_string.hpp>
 #include <crails/cli/process.hpp>
+#include <sstream>
 #include <iostream>
 #include "../../databases/mysql.hpp"
 #include "../../hostie_variables.hpp"

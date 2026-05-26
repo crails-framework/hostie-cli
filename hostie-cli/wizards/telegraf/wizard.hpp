@@ -1,6 +1,7 @@
 #pragma once
 #include <crails/cli/process.hpp>
 #include <crails/cli/filesystem.hpp>
+#include <sstream>
 #include <iostream>
 #include "../../hostie_variables.hpp"
 
