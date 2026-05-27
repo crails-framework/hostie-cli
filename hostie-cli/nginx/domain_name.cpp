@@ -1,4 +1,5 @@
 #include "domain_name.hpp"
+#include "root.hpp"
 #include <crails/utils/semantics.hpp>
 #include <crails/utils/split.hpp>
 #include <cstdlib>
@@ -43,5 +44,5 @@ string DomainNameCommand::webmaster_email() const
 
 filesystem::path DomainNameCommand::site_conf_path() const
 {
-  return filesystem::path("/etc/nginx/sites-enabled") / (site.name + ".hostie");
+  return nginx_root_path() / "sites-enabled" / (site.name + ".hostie");
 }

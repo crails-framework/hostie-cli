@@ -17,7 +17,8 @@ filesystem::path fpm_pool_path(const InstanceEnvironment& environment)
 {
   vector<filesystem::path> candidates{
     filesystem::path("/etc/php") / php_version() / "fpm" / "pool.d",
-    filesystem::path("/etc/php-fpm.d")
+    filesystem::path("/etc/php-fpm.d"),
+    filesystem::path("/usr/local/etc/php-fpm.d")
   };
   string filename = environment.get_project_name() + ".conf";
 

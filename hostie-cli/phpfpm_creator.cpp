@@ -2,6 +2,7 @@
 #include "user.hpp"
 #include "hostie_variables.hpp"
 #include "php.hpp"
+#include "system.hpp"
 #include <crails/read_file.hpp>
 #include <crails/utils/split.hpp>
 #include <crails/cli/process.hpp>
@@ -86,7 +87,7 @@ bool PhpFpmCreator::restart_php_fpm()
 {
   string service_name = HostieVariables::global->variable_or("php-fpm-service-name", "php-fpm");
 
-  return Crails::run_command("systemctl reload " + service_name);
+  return reload_service(service_name);
 }
 
 int PhpFpmCreator::cancel(InstanceUser& user)

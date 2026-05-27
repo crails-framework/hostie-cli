@@ -1,4 +1,5 @@
 #include "list_command.hpp"
+#include "root.hpp"
 #include <filesystem>
 #include <iostream>
 
@@ -7,14 +8,17 @@ using namespace Nginx;
 
 int ListCommand::run()
 {
-  filesystem::path path("/etc/nginx/sites-enabled");
+  filesystem::path path = nginx_root_path() / "sites-enabled";
 
-  for (const auto& entry : filesystem::directory_iterator(path))
+  if (filesystem::is_directory(path))
   {
-    filesystem::path site_path = entry.path();
+    for (const auto& entry : filesystem::directory_iterator(path))
+    {
+      filesystem::path site_path = entry.path();
 
-    if (site_path.extension().string() == ".hostie")
-      cout << site_path.stem().string() << endl;
+      if (site_path.extension().string() == ".hostie")
+        cout << site_path.stem().string() << endl;
+    }
   }
   return 0;
 }

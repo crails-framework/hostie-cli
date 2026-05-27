@@ -1,4 +1,6 @@
 #include "site.hpp"
+#include "root.hpp"
+#include "../system.hpp"
 #include <crails/cli/process.hpp>
 #include <sstream>
 #include <iostream>
@@ -176,12 +178,13 @@ string ConfigureSite::server_locations(bool ssl, bool certified)
 string ConfigureSite::server_common_conf(const string_view domain_name)
 {
   ostringstream stream;
+  const string root_path = nginx_root_path().string();
 
   stream
     << ind(1) "server_name " << domain_name << ';' << endl
     << ind(1) "root " << site.var_directory.string() << ';' << endl
-    << ind(1) "include /etc/nginx/standard-error-pages.conf*;" << endl
-    << ind(1) "include /etc/nginx/letsencrypt.conf*;" << endl
+    << ind(1) "include " << root_path << "/standard-error-pages.conf*;" << endl
+    << ind(1) "include " << root_path << "/letsencrypt.conf*;" << endl
     << server_custom_settings(site);
   return stream.str();
 }
@@ -276,7 +279,7 @@ int ConfigureSite::make_site()
   {
     stream << site_conf();
     stream.close();
-    if (system("systemctl reload nginx") == 0)
+    if (reload_service("nginx"))
       return 0;
     cerr << "failed to reload nginx" << endl;
     return 11;

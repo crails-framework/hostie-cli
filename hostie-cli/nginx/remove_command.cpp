@@ -1,4 +1,5 @@
 #include "remove_command.hpp"
+#include "../system.hpp"
 
 using namespace std;
 
@@ -8,7 +9,7 @@ namespace Nginx
   {
     if (!filesystem::exists(site_conf_path()) || filesystem::remove(site_conf_path()))
     {
-      system("systemctl reload nginx");
+      reload_service("nginx");
       return 0;
     }
     return -1;

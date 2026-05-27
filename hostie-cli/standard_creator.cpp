@@ -146,7 +146,7 @@ bool StandardCreator::load_user(InstanceUser& user, const boost::program_options
     user.name = options["user"].as<string>();
   else
     user.name = options["name"].as<string>();
-  if (options.count("group"))
+  if (options.count("group") && options["group"].as<string>().length() > 0)
     user.group = options["group"].as<string>();
   else
     user.group = user.name;
