@@ -23,12 +23,18 @@ static const string wp_must_use_plugin_src =
   "add_filter('the_generator', '__return_empty_string');\n"
   "function remove_version_query_strings($src) {\n"
   "  if (strpos($src, 'ver=')) {\n"
-  "      $src = remove_query_arg('ver', $src);\n"
+  "    $src = remove_query_arg('ver', $src);\n"
   "  }\n"
   "  return $src;\n"
   "}\n"
   "add_filter('style_loader_src', 'remove_version_query_strings', 999);\n"
   "add_filter('script_loader_src', 'remove_version_query_strings', 999);\n"
+  "add_filter('rest_pre_dispatch', function ($result, $server, $request) {\n"
+  "  if (!is_user_logged_in() && strpos($request->get_route(), '/batch/v1') !== false) {\n"
+  "    return new WP_Error('rest_batch_disabled', 'Batch API disabled for anonymous requests.', ['status' => 403]);\n"
+  "  }\n"
+  "  return $result;\n"
+  "}, 5, 3);\n"
   "?>";
 
 static string find_latest_version(const WizardBase& wizard)
