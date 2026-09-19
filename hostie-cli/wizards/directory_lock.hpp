@@ -5,18 +5,18 @@ struct DirectoryLock
 {
   std::filesystem::path path;
 public:
-  DirectoryLock(const filesystem::path& path) : path(path)
+  DirectoryLock(const std::filesystem::path& path) : path(path)
   {
-    filesystem::create_directories(path);
+    std::filesystem::create_directories(path);
   }
 
   ~DirectoryLock()
   {
-    filesystem::remove_all(path);
+    std::filesystem::remove_all(path);
   }
 
   operator bool() const
   {
-    return filesystem::exists(path);
+    return std::filesystem::exists(path);
   }
 };
