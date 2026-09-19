@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <string_view>
+#include <optional>
 #include <crails/database_url.hpp>
 #include <crails/cli/process.hpp>
 
@@ -23,6 +24,7 @@ struct PostgresDatabase
 
   bool run_query(const std::string_view, const std::string_view database = "") const;
   bool table_exists(const std::string_view) const;
+  std::optional<std::uint64_t> disk_usage() const;
 
 private:
   Crails::ExecutableCommand sql_query_command(const std::string_view, const std::string_view database = "") const;

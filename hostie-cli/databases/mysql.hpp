@@ -23,6 +23,7 @@ struct MysqlDatabase
   bool drop_database() const;
 
   bool run_query(const std::string_view, const std::string_view database = "") const;
+  std::optional<std::uint64_t> disk_usage() const;
 
 private:
   Crails::ExecutableCommand sql_query_command(const std::string_view, const std::string_view database = "") const;

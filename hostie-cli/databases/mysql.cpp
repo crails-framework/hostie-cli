@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include "mysql.hpp"
 #include "../hostie_variables.hpp"
+#include "sql_helpers.hpp"
 
 using namespace std;
 
@@ -60,6 +61,20 @@ bool MysqlDatabase::run_query(const string_view query, const string_view db_name
   Crails::ExecutableCommand command = sql_query_command(query, db_name);
 
   return Crails::run_command(command);
+}
+
+optional<uint64_t> MysqlDatabase::disk_usage() const
+{
+  string output;
+  string query =
+    "SELECT CAST(COALESCE(SUM(data_length + index_length), 0) AS UNSIGNED) "
+    "FROM information_schema.tables "
+    "WHERE table_schema = " + sql_string_literal(database_name, true);
+
+  if (Crails::run_command(sql_query_command(string_view(query)), output))
+    return parse_trailing_integer(output);
+  cerr << "failed to measure the size of database " << database_name << endl;
+  return nullopt;
 }
 
 bool MysqlDatabase::user_exists() const

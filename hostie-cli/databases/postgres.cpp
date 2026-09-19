@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cstdlib>
 #include "postgres.hpp"
+#include "sql_helpers.hpp"
 #include "../hostie_variables.hpp"
 
 using namespace std;
@@ -65,6 +66,17 @@ bool PostgresDatabase::table_exists(const string_view name) const
 
   query << "SELECT 1 FROM pg_tables WHERE tablename = '" << name << '\'';
   return run_query(query.str(), string_view(database_name));
+}
+
+optional<uint64_t> PostgresDatabase::disk_usage() const
+{
+  string output;
+  string query = "SELECT pg_database_size(" + sql_string_literal(database_name, false) + ')';
+
+  if (Crails::run_command(sql_query_command(string_view(query)), output))
+    return parse_trailing_integer(output);
+  cerr << "failed to measure the size of database " << database_name << endl;
+  return {};
 }
 
 bool PostgresDatabase::user_exists() const
