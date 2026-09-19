@@ -1,5 +1,5 @@
 #pragma once
-#include "list_command.hpp"
+#include "../list_command.hpp"
 
 class InventoryCommand : public ListCommand
 {

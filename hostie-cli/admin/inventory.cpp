@@ -1,5 +1,5 @@
 #include "inventory.hpp"
-#include "environment.hpp"
+#include "../environment.hpp"
 #include <algorithm>
 #include <charconv>
 #include <iostream>
