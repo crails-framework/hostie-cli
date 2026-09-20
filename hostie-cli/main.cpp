@@ -11,6 +11,7 @@
 #include "nextcloud/index.hpp"
 #include "wizards/index.hpp"
 #include "nginx/index.hpp"
+#include "admin.hpp"
 #include "hostie_variables.hpp"
 
 using namespace std;
