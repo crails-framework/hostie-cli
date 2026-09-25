@@ -1,6 +1,6 @@
 # hostie-cli
 
-A command line interface tool to create, configure and web applications.
+A command line interface tool to create, configure and manage web applications.
 
 Supports the following web applications:
 - [Wordpress](https://wordpress.com/)
@@ -9,6 +9,15 @@ Supports the following web applications:
 - [Odoo](https://www.odoo.com)
 
 ## Installing
+
+### Repositories
+
+Packaged releases of hostie-cli are available at the following repositories:
+
+- [Ubuntu](https://github.com/planed-es/ubuntu-ppa)
+- [FreeBSD](https://github.com/planed-es/freebsd-repo)
+
+### Building from source
 
 hostie-cli uses the [build2](https://www.build2.org/) build system, and you
 may use this git repository as a build2 package.
@@ -94,22 +103,55 @@ in the `/etc/hostie.rc` file to modify that behavior.
 
 ## Creating applications
 
-TODO
+For each type of application, you may use the `create` command to generate a
+new instance. Common options are:
 
-## Setting up the webserver
+- `-n` for the instance name
+- `-u` for the system user which will own the instance files
+- `-x` for the domain names the instance will answer to
 
-TODO
+For instance, you could create a Wordpress instance with the following command:
 
 ```sh
-hostie-cli wizard nginx
+hostie-cli wordpress create -n my_site -u site_user -x mydomain.com www.mydomain.com
 ```
 
+Once an instance has been created, you will need to register it on a web
+server, such as NGINX:
+
 ```sh
-hostie-cli nginx configure -n APPLICATION_NAME
+hostie-cli wizard nginx # only if you haven't run this command before
+hostie-cli nginx configure -n my_site
 ```
 
-### Acquiring and refreshing SSL certificates
+Assuming you have created the appropriate DNS records, your site should now
+be up and available. You'll probably want to add a certificate and SSL support:
 
 ```sh
-hostie-cli nginx certify -n APPLICATION_NAME
+hostie-cli nginx certify -n my_site
+```
+
+### Application ports
+
+Some application may require a port to run (Odoo, CrailsCMS), in which case,
+you may specify the port with the `-p` option:
+
+```sh
+hostie-cli crailscms create -n my_cms -u my_cms -x mycms.com -p 3001
+```
+
+### Odoo options
+
+The Odoo creator provides additional options. Odoo needs a port for _gevent_:
+by default, it will use the provided port increased by one. You may also
+specify the gevent port manually:
+
+```sh
+hostie-cli odoo create -n my_odoo -u odoo -x myodoo.com -p 3002 --gevent-port 3003
+```
+
+You may also want to disable demo data for modules:
+
+```sh
+hostie-cli odoo create -n my_odoo -u odoo -x myodoo.com -p 3002 --without-demo
 ```
