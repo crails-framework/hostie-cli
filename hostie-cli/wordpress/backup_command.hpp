@@ -24,7 +24,7 @@ namespace Wordpress
         schedule = options["schedule"].as<string>();
       command
         << "-d" << database_url
-        << "-f" << (var_directory / "wp-content").string()
+        << "-f" << ("vardir:" + (var_directory / "wp-content").string())
         << "-s" << schedule;
     }
   };

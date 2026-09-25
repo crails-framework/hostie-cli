@@ -24,7 +24,7 @@ namespace Odoo
         schedule = options["schedule"].as<string>();
       command
         << "-d" << database_url
-        << "-f" << var_directory
+        << "-f" << ("vardir:" + var_directory.string())
         << "-s" << schedule;
     }
   };
