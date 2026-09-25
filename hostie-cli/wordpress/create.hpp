@@ -24,7 +24,8 @@ namespace Wordpress
 
     int run() override;
 
-    bool migrate_database();
+    virtual bool migrate_database(const SystemService&) { return true; }
+    virtual bool post_install_actions(const MysqlDatabase&) { return true; }
     bool prepare_wordpress(const InstanceUser&);
     bool generate_wp_config(const InstanceUser&, const MysqlDatabase&);
 

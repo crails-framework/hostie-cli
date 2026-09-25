@@ -149,33 +149,39 @@ int CreateCommand::run()
       service.require() &&
       prepare_database(database))
   {
-    Crails::run_command({"chown", {service.app_user, var_directory.string()}});
-    if (service.reload_service_files() && service.start())
+    if (post_install_actions(database))
     {
-      unsigned int attempts = 0;
-      cerr << "successfully started service " << service.app_name << endl;
-      while (!database.table_exists("res_users") && attempts++ < 10)
-        sleep(2);
-      // for some unknown reason, the first attempt always fails:
-      attempts = 0;
-      while (!update_admin_password(database) && attempts++ < 10)
-        sleep(2);
-      if (attempts < 10)
-      {
-        cerr << "updated admin password" << endl;
-        setup_base_url(database);
-        return 0;
-      }
-      return 3;
+      Crails::run_command({"chown", {service.app_user, var_directory.string()}});
+      if (service.reload_service_files() && service.start())
+        return setup_admin_user(service, database);
+      else
+        cerr << "failed to start service " << service.app_name << endl;
+      return 2;
     }
-    else
-      cerr << "failed to start service " << service.app_name << endl;
-    return 2;
   }
   return cancel(user, database);
 }
 
-bool CreateCommand::update_admin_password(PostgresDatabase& database) const
+int CreateCommand::setup_admin_user(const SystemService& service, const PostgresDatabase& database)
+{
+  unsigned int attempts = 0;
+  cerr << "successfully started service " << service.app_name << endl;
+  while (!database.table_exists("res_users") && attempts++ < 10)
+    sleep(2);
+  // for some unknown reason, the first attempt always fails:
+  attempts = 0;
+  while (!update_admin_password(database) && attempts++ < 10)
+    sleep(2);
+  if (attempts < 10)
+  {
+    cerr << "updated admin password" << endl;
+    setup_base_url(database);
+    return 0;
+  }
+  return 3;
+}
+
+bool CreateCommand::update_admin_password(const PostgresDatabase& database) const
 {
   ostringstream query;
 
@@ -196,7 +202,7 @@ bool CreateCommand::prepare_database(const PostgresDatabase& database)
   return false;
 }
 
-bool CreateCommand::setup_base_url(PostgresDatabase& database) const
+bool CreateCommand::setup_base_url(const PostgresDatabase& database) const
 {
   bool success = options.count("domains");
 

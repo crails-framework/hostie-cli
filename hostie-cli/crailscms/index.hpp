@@ -24,6 +24,6 @@ public:
     add_command("remove", []() { return std::make_shared<RemoveCommand>(); });
     add_command("backup", []() { return std::make_shared<CrailsCms::BackupCommand>(); });
     add_command("restore", []() { return std::make_shared<CrailsCms::RestoreCommand>(); });
-    add_command("restore-into", []() { return std::make_shared<RestoreIntoCommand>(); });
+    add_command("restore-into", []() { return std::make_shared<CrailsCms::RestoreIntoCommand>(); });
   }
 };

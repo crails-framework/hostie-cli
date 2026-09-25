@@ -59,7 +59,8 @@ int CreateCommand::run()
         database.prepare_database())
     {
       state += DatabaseCreated;
-      return 0;
+      if (post_install_actions(database))
+        return 0;
     }
     return cancel(user, database);
   }

@@ -7,6 +7,8 @@
 
 struct PostgresDatabase
 {
+  static constexpr std::string_view backup_key = "postgres";
+
   std::string user, password;
   std::string database_name;
   std::string hostname = "127.0.0.1";

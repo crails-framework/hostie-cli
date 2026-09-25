@@ -49,10 +49,13 @@ int CreateCommand::run()
         database.prepare_database())
     {
       state += DatabaseCreated;
-      if (install_nextcloud(user, database) && post_install_nextcloud(user))
-        return 0;
-      else
-        cerr << "Failed to run `occ maintenance:install` and post-install hooks" << endl;
+      if (post_install_actions(database))
+      {
+        if (install_nextcloud(user, database) && post_install_nextcloud(user))
+          return 0;
+        else
+          cerr << "Failed to run `occ maintenance:install` and post-install hooks" << endl;
+      }
       return 14;
     }
     return cancel(user, database);

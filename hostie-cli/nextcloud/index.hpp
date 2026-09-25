@@ -17,5 +17,6 @@ public:
     add_command("remove", []() { return std::make_shared<RemoveCommand>(); });
     //add_command("backup", []() { return std::make_shared<NextCloud::BackupCommand>(); });
     //add_command("restore", []() { return std::make_shared<NextCloud::RestoreCommand>(); });
+    //add_command("restore-into", []() { return std::make_shared<NextCloud::RestoreIntoCommand>(); });
   }
 };

@@ -27,8 +27,9 @@ namespace NextCloud
 
     void append_custom_fpm_pool_settings(std::ostream&) override;
     bool prepare_nextcloud(const InstanceUser&);
-    bool install_nextcloud(const InstanceUser&, const MysqlDatabase&);
-    bool post_install_nextcloud(const InstanceUser&);
+    virtual bool install_nextcloud(const InstanceUser&, const MysqlDatabase&);
+    virtual bool post_install_nextcloud(const InstanceUser&);
+    virtual bool post_install_actions(const MysqlDatabase&) { return true; }
     bool configure_overwrite_cli_url(const InstanceUser&, const std::string&);
     bool configure_trusted_domains(const InstanceUser&, const std::vector<std::string>&);
 

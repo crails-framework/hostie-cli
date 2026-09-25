@@ -85,14 +85,17 @@ int CreateCommand::run()
       service.require() &&
       prepare_database(service, database))
   {
-    if (service.reload_service_files() && service.start())
+    if (post_install_actions(database))
     {
-      cerr << "successfully started service " << service.app_name << endl;
-      return 0;
+      if (service.reload_service_files() && service.start())
+      {
+        cerr << "successfully started service " << service.app_name << endl;
+        return 0;
+      }
+      else
+        cerr << "failed to start service " << service.app_name << endl;
+      return 2;
     }
-    else
-      cerr << "failed to start service " << service.app_name << endl;
-    return 2;
   }
   return cancel(user, database);
 }
@@ -102,12 +105,12 @@ bool CreateCommand::prepare_database(const SystemService& service, const Postgre
   if (database.prepare_user() && database.prepare_database())
   {
     state += DatabaseCreated;
-    return migrate_database(service);
+    return migrate_database();
   }
   return false;
 }
 
-bool CreateCommand::migrate_database(const SystemService& service)
+bool CreateCommand::migrate_database()
 {
   stringstream command, migrate_command;
   filesystem::path migrate_task =
