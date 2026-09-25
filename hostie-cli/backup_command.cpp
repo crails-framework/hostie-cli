@@ -28,8 +28,8 @@ void BackupCommand::options_description(boost::program_options::options_descript
 {
   ::LiveInstanceCommand::options_description(options);
   options.add_options()
-    ("action,a", boost::program_options::value<string>(), "schedule action to perform: add, remove, status or list. Defaults to list.")
-    ("schedule,s", boost::program_options::value<string>(), "cron expression describing the periodicity of backups");
+    ("action,a", boost::program_options::value<string>(), "schedule action to perform: add, remove, status, list, or run. Defaults to list.")
+    ("schedule,s", boost::program_options::value<string>(), "cron expression describing the periodicity of backups (only used by \"add\")");
 }
 
 int BackupCommand::run()
@@ -39,14 +39,25 @@ int BackupCommand::run()
 
   if (options.count("action"))
     action = options["action"].as<string>();
-  if (action != "add" && action != "remove" && action != "list" && action != "status")
+  if (action != "add" && action != "remove" && action != "list" && action != "status" && action != "run")
   {
     cerr << "unknown action " << action << endl;
     return -1;
   }
   command.path = crails_backup_bin();
-  command << action << "-n" << environment.get_project_name();
-  if (action == "add")
-    append_add_backup_params(command);
+  if (action == "run")
+  {
+    command << "backup" << "-n" << environment.get_project_name();
+    append_backup_source_params(command);
+  }
+  else
+  {
+    command << action << "-n" << environment.get_project_name();
+    if (action == "add")
+    {
+      append_backup_source_params(command);
+      command << "-s" << (options.count("schedule") ? options["schedule"].as<string>() : default_backup_schedule());
+    }
+  }
   return Crails::run_command(command);
 }

@@ -13,19 +13,15 @@ namespace CrailsCms
       return "CrailsCMS";
     }
 
-    void append_add_backup_params(Crails::ExecutableCommand& command) const override
+    void append_backup_source_params(Crails::ExecutableCommand& command) const override
     {
       using namespace std;
       string database_url = environment.get_variable("DATABASE_URL");
       filesystem::path var_directory = environment.get_variable("VAR_DIRECTORY");
-      string schedule = "0 * * *";
 
-      if (options.count("schedule"))
-        schedule = options["schedule"].as<string>();
       command
         << "-d" << database_url
-        << "-f" << ("vardir:" + var_directory.string())
-        << "-s" << schedule;
+        << "-f" << ("vardir:" + var_directory.string());
     }
   };
 }
