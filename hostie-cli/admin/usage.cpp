@@ -52,6 +52,21 @@ static UsageBytes directory_usage(const filesystem::path& root)
   return total;
 }
 
+static UsageBytes mongodb_usage(const string& url)
+{
+  Crails::ExecutableCommand command;
+  string output;
+
+  command.path = "mongosh";
+  command
+    << url << "--quiet" << "--eval"
+    << "const s = db.stats(); print(Math.round(s.storageSize + s.indexSize))";
+  if (Crails::run_command(command, output))
+    return parse_trailing_integer(output);
+  cerr << "failed to measure the size of the mongodb database" << endl;
+  return {};
+}
+
 static UsageBytes database_usage(const string& raw_url)
 {
   try
@@ -70,6 +85,8 @@ static UsageBytes database_usage(const string& raw_url)
       database.from_url(url);
       return database.disk_usage();
     }
+    else if (url.type.rfind("mongodb", 0) == 0)
+      return mongodb_usage(raw_url);
     cerr << "unsupported database type '" << url.type << '\'' << endl;
   }
   catch (const exception& error)
