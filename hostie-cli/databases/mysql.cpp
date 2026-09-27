@@ -51,7 +51,7 @@ Crails::ExecutableCommand MysqlDatabase::sql_query_command(const string_view que
   if (db_name.length())
     command << "-D" << db_name;
   command << "-e" << query;
-  cout << "sql query: " << query << endl;
+  cerr << "sql query: " << query << endl;
   cerr << "== " << command << endl;
   return command;
 }

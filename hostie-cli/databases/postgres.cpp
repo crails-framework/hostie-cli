@@ -42,7 +42,7 @@ Crails::ExecutableCommand PostgresDatabase::sql_query_command(const string_view 
   const string postgres_password = HostieVariables::global->variable("postgres_root");
 
   setenv("PGPASSWORD", postgres_password.c_str(), 1);
-  cout << "sql query: " << query << endl;
+  cerr << "sql query: " << query << endl;
   command.path = "psql";
   command 
           << "-U" << postgres_username
