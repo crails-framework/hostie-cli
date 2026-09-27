@@ -85,12 +85,12 @@ static optional<InstanceSpecs> collect_instance(const filesystem::path& filepath
 
   if (filepath.extension() == ".env")
   {
+    instance.name = filepath.stem().string();
     environment.set_project_name(instance.name);
     environment.load();
     instance.type = environment.get_variable("APPLICATION_TYPE");
     if (instance.type.size() > 0)
     {
-      instance.name = filepath.stem().string();
       instance.var_directory = environment.get_variable("VAR_DIRECTORY");
       instance.domains = collect_domains(environment);
       collect_ports(instance, environment);
