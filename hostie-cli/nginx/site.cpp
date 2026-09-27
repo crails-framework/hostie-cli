@@ -110,7 +110,7 @@ string ConfigureSite::location_forbidden(const Location& location)
   ostringstream stream;
 
   stream
-  << ind(1) "location" << location.path << "{ deny all; return 403; }" << endl;
+  << ind(1) "location " << location.path << " { deny all; return 403; }" << endl;
   return stream.str();
 }
 
@@ -119,7 +119,7 @@ string ConfigureSite::location_redirect(const Location& location)
   ostringstream stream;
 
   stream
-  << ind(1) "location " << location.path << '{' << endl
+  << ind(1) "location " << location.path << " {" << endl
   << ind(2) "return 301 " << location.target << ';' << endl
   << ind(1) '}' << endl;
   return stream.str();
