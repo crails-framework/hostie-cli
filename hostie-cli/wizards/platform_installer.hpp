@@ -7,7 +7,12 @@
 #include "wizard.hpp"
 
 #define ADD_PLATFORM(provider, release, klass) \
-  PlatformInstaller::Installer{provider, release, []() -> int { return klass().run(); }}
+  PlatformInstaller::Installer{ \
+    provider, \
+    release, \
+    []() -> int { return klass().run(); }, \
+    []() -> bool { return klass().is_installed(); } \
+  }
 
 class PlatformInstaller : public Crails::Command
 {
@@ -17,6 +22,7 @@ public:
     const std::string_view distribution;
     const std::string_view version;
     std::function<int ()>  installer;
+    std::function<bool ()> is_installed;
   };
 
   PlatformInstaller& operator<<(Installer runner)
@@ -25,24 +31,43 @@ public:
     return *this;
   }
 
-  int run() override
+  std::vector<Installer>::const_iterator find_runner() const
   {
-    std::vector<Installer> candidates;
+    std::vector<std::vector<Installer>::const_iterator> candidates;
 
-    for (const Installer runner : runners)
+    for (auto it = runners.begin() ; it != runners.end() ; ++it)
     {
+      const Installer& runner = *it;
       switch (WizardBase::system_matches(runner.distribution, runner.version))
       {
       case 2:
-        return runner.installer();
+        return it;
       case 1:
-        candidates.push_back(runner);
+        candidates.push_back(it);
       case 0:
         break ;
       }
     }
     if (candidates.size() > 0)
-      return candidates.begin()->installer();
+      return *(candidates.begin());
+    return runners.end();
+  }
+
+  bool is_installed() const
+  {
+    auto it = find_runner();
+
+    if (it != runners.end())
+      return it->is_installed();
+    return false;
+  }
+
+  int run() override
+  {
+    auto it = find_runner();
+
+    if (it != runners.end())
+      return it->installer();
     std::cerr << "No installer available for your platform" << std::endl;
     return -1;
   }
