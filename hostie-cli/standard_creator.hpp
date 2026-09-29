@@ -4,7 +4,7 @@
 #include <filesystem>
 
 class SystemService;
-class InstanceUser;
+struct InstanceUser;
 
 class StandardCreator : public InstanceCommand
 {

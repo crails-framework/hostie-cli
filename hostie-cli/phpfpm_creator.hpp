@@ -4,7 +4,7 @@
 #include <ostream>
 
 class SystemService;
-class InstanceUser;
+struct InstanceUser;
 
 class PhpFpmCreator : public StandardCreator
 {

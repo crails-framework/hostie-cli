@@ -1,7 +1,7 @@
 #pragma once
 #include "../phpfpm_creator.hpp"
 
-class InstanceUser;
+struct InstanceUser;
 class MysqlDatabase;
 
 namespace NextCloud

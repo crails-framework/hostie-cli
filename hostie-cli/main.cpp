@@ -9,6 +9,7 @@
 #include "wordpress/index.hpp"
 #include "odoo/index.hpp"
 #include "nextcloud/index.hpp"
+#include "html/index.hpp"
 #include "wizards/index.hpp"
 #include "nginx/index.hpp"
 #include "admin.hpp"
@@ -28,6 +29,7 @@ int main(int argc, const char** argv)
   index.add_command("wordpress", []() { return std::make_shared<WordpressIndex>(); });
   index.add_command("odoo",      []() { return std::make_shared<OdooIndex>(); });
   index.add_command("nextcloud", []() { return std::make_shared<NextCloudIndex>(); });
+  index.add_command("html",      []() { return std::make_shared<HtmlIndex>(); });
   index.add_command("nginx",     []() { return std::make_shared<Nginx::IndexCommand>(); }); // TODO check for nginx first ?
   index.add_command("wizard",    []() { return std::make_shared<WizardsIndex>(); });
   index.add_command("admin",     []() { return std::make_shared<AdminIndex>(); });
