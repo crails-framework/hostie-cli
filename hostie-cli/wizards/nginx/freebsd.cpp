@@ -23,7 +23,7 @@ int Wizard::run()
 bool Wizard::start_service()
 {
   return Crails::run_command("service nginx onestart")
-      && Crails::run_command("sysrc nginx_enabled=\"YES\"");
+      && Crails::run_command("sysrc nginx_enable=\"YES\"");
 }
 
 bool Wizard::prepare_conf()
