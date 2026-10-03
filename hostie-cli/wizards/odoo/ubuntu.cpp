@@ -28,7 +28,7 @@ int Wizard::run()
     {
       string add_source_command =
         "echo 'deb [signed-by=" + keyring_path.string() + "] "
-        "https://nightly.odoo.com/17.0/nightly/deb/ ./' | "
+        "https://nightly.odoo.com/19.0/nightly/deb/ ./' | "
         "sudo tee /etc/apt/sources.list.d/odoo.list";
 
       if (system(add_source_command.c_str()) == 0)
