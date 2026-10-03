@@ -34,3 +34,11 @@ bool UbuntuWizard::add_repository(const string& name, const string_view list, co
     cerr << "cannot write into file " << target << endl;
   return false;
 }
+
+std::string UbuntuWizard::release_codename() const
+{
+  std::string codename;
+
+  Crails::run_command("lsb_release -sc", codename);
+  return codename;
+}
