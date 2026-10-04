@@ -1,4 +1,5 @@
 #include "wizard.hpp"
+#include "../../databases/mongodb.hpp"
 #include <crails/utils/random_string.hpp>
 #include <crails/cli/process.hpp>
 #include <crails/read_file.hpp>
@@ -11,7 +12,7 @@ using namespace MongoDB;
 
 int Wizard::run()
 {
-  password = Crails::generate_random_string("ABCDEFGHIJKLMNOPQRSTWXYZ-_abcdefghijklmnopqrstuvwxyz0123456789", 12);
+  password = Crails::generate_random_string(MongoDatabase::password_charset, 12);
   store.variable("mongodb", "1");
   store.variable("mongodb_root", password);
   store.save();
