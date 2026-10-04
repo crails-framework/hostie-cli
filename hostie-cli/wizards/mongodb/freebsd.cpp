@@ -16,6 +16,7 @@ int Wizard::run()
     package_name += mongodb_version[0];
     package_name += mongodb_version[2];
     requirements.push_back(package_name);
+    requirements.push_back("mongosh");
     if (install_requirements() && prepare_conf() && start_service())
       return MongoDB::Wizard::run();
   }
@@ -28,6 +29,11 @@ bool Wizard::start_service()
 {
   return Crails::run_command("service mongod onestart")
       && Crails::run_command("sysrc mongod_enable=\"YES\"");
+}
+
+bool Wizard::restart_service()
+{
+  return Crails::run_command("service mongod restart");
 }
 
 bool Wizard::prepare_conf()
@@ -48,7 +54,7 @@ bool Wizard::prepare_conf()
     "  port: 27017\n"
     "  bindIp: 127.0.0.1\n"
   );
-  ofstream stream("/usr/local/etc/mongod.conf", ios::trunc);
+  ofstream stream(get_mongod_conf_path(), ios::trunc);
 
   if (stream.is_open())
   {
@@ -59,6 +65,6 @@ bool Wizard::prepare_conf()
     return true;
   }
   else
-    cerr << "Could not open /usr/local/etc/mongod.conf" << endl;
+    cerr << "Could not open " << get_mongod_conf_path() << endl;
   return true;
 }

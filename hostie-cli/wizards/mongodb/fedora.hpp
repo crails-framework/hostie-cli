@@ -11,6 +11,7 @@ namespace MongoDB
     public:
       int run();
       bool start_service();
+      bool restart_service() override;
     };
   }
 }

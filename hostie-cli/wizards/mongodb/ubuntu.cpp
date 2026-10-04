@@ -41,3 +41,8 @@ bool Wizard::start_service()
   return Crails::run_command("systemctl enable mongod")
       && Crails::run_command("systemctl start mongod");
 }
+
+bool Wizard::restart_service()
+{
+  return Crails::run_command("systemctl restart mongod");
+}

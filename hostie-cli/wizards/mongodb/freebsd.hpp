@@ -11,7 +11,13 @@ namespace MongoDB
     public:
       int run();
       bool start_service();
+      bool restart_service() override;
       bool prepare_conf();
+
+      std::string get_mongod_conf_path() const override
+      {
+        return "/usr/local/etc/mongod.conf";
+      }
     };
   }
 }
