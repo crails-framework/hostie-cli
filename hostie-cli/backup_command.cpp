@@ -59,5 +59,5 @@ int BackupCommand::run()
       command << "-s" << (options.count("schedule") ? options["schedule"].as<string>() : default_backup_schedule());
     }
   }
-  return Crails::run_command(command);
+  return Crails::run_command(command) ? 0 : 1;
 }

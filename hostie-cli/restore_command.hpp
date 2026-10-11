@@ -1,5 +1,10 @@
 #pragma once
 #include "live_instance_command.hpp"
+#include <crails/cli/process.hpp>
+#include <filesystem>
+#include <iostream>
+
+std::filesystem::path crails_backup_bin();
 
 class RestoreCommand : public ::LiveInstanceCommand
 {
@@ -20,16 +25,17 @@ public:
   int run() override
   {
     using namespace std;
-    ostringstream command;
-    string_view action = "restore";
+    Crails::ExecutableCommand command;
 
     if (!options.count("id"))
+    {
+      cerr << "missing required option --id" << endl;
       return -1;
-    command
-      << "/usr/local/bin/crails-backup " << action << ' '
-      << "-n " << quoted(environment.get_project_name())
-      << "--id " << options["id"].as<string>();
-    cout << "+ " << command.str() << endl;
-    return system(command.str().c_str()) == 0;
+    }
+    command.path = crails_backup_bin();
+    command << "restore" << "-n" << environment.get_project_name()
+            << "--id" << options["id"].as<string>();
+    cout << "+ " << command << endl;
+    return Crails::run_command(command) ? 0 : 1;
   }
 };
