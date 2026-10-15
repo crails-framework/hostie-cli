@@ -112,11 +112,11 @@ bool CreateCommand::prepare_database(const SystemService& service, const Postgre
 
 bool CreateCommand::migrate_database()
 {
-  stringstream command, migrate_command;
+  ostringstream command, migrate_command;
   filesystem::path migrate_task =
     crailscms_bin_dir / "tasks" / "odb_migrate" / "task";
 
-  migrate_command << migrate_task << " odb";
+  migrate_command << migrate_task << " -c odb";
   if (run_command_as_app_user(migrate_command.str()) != 0)
   {
     cerr << "failed to migrate database" << endl;
