@@ -87,7 +87,7 @@ bool InstanceEnvironment::save()
 
   if (stream.is_open())
   {
-    stream << "#/bin/sh\n";
+    stream << "#!/bin/sh\n";
     for (auto it = variables.begin() ; it != variables.end() ; ++it)
       stream << it->first << '=' << quoted(it->second) << '\n';
     stream.close();
