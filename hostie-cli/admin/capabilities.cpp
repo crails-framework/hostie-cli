@@ -35,7 +35,7 @@ int CapabilitiesCommand::run()
   for (const string& cap : collect_caps())
   {
     if (!first)
-      cout << ','
+      cout << ',';
     cout << quoted(cap);
     first = false;
   }
