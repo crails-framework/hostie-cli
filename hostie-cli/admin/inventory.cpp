@@ -10,12 +10,14 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <filesystem>
 
 using namespace std;
 
 struct InstanceSpecs
 {
   string type, name, var_directory;
+  optional<string> log_directory;
   vector<string> domains;
   vector<pair<string, unsigned short>> ports;
 };
@@ -78,6 +80,15 @@ static vector<string> collect_domains(const InstanceEnvironment& environment)
   return domains;
 }
 
+static optional<string> find_log_directory(const InstanceEnvironment& environment)
+{
+  filesystem::path candidate = filesystem::path("/var/log") / environment.get_project_name();
+
+  if (filesystem::is_directory(candidate))
+    return candidate.string();
+  return {};
+}
+
 static optional<InstanceSpecs> collect_instance(const filesystem::path& filepath)
 {
   InstanceSpecs instance;
@@ -92,6 +103,7 @@ static optional<InstanceSpecs> collect_instance(const filesystem::path& filepath
     if (instance.type.size() > 0)
     {
       instance.var_directory = environment.get_variable("VAR_DIRECTORY");
+      instance.log_directory = find_log_directory(environment);
       instance.domains = collect_domains(environment);
       collect_ports(instance, environment);
     }
@@ -115,8 +127,10 @@ static void output_instance(ostream& out, const InstanceSpecs& instance)
     if (i > 0) out << ", ";
     out << std::quoted(instance.domains[i]);
   }
-  out << "],\n    \"var_directory\": " << std::quoted(instance.var_directory)
-      << ",\n    \"ports\": {";
+  out << "],\n    \"var_directory\": " << std::quoted(instance.var_directory);
+  if (instance.log_directory.has_value())
+    out << ",\n    \"log_directory\": " << std::quoted(*instance.log_directory);
+  out << ",\n    \"ports\": {";
   for (size_t i = 0 ; i < instance.ports.size() ; ++i)
   {
     if (i > 0) out << ", ";
