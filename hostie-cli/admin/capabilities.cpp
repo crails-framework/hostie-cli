@@ -30,9 +30,15 @@ static vector<string> collect_caps()
 
 int CapabilitiesCommand::run()
 {
+  bool first = true;
   cout << '[';
   for (const string& cap : collect_caps())
+  {
+    if (!first)
+      cout << ','
     cout << quoted(cap);
+    first = false;
+  }
   cout << ']';
   return 0;
 }
