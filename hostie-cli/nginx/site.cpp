@@ -93,6 +93,8 @@ string ConfigureSite::location_proxy_pass(const Location& location, bool ssl)
   stream
   << ind(1) "location " << location.path << " {" << endl
   << ind(2) "proxy_pass http://" << location.target << ';' << endl
+  << ind(2) "proxy_set_header Upgrade           $http_upgrade;" << endl
+  << ind(2) "proxy_set_header Connection        $connection_upgrade;" << endl
   << ind(2) "proxy_set_header Host              $host;" << endl
   << ind(2) "proxy_set_header X-Real-IP         $remote_addr;" << endl
   << ind(2) "proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;" << endl
