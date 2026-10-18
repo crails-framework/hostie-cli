@@ -15,5 +15,5 @@ public:
 
 protected:
   virtual void append_backup_source_params(Crails::ExecutableCommand& command) const = 0;
-  virtual std::string default_backup_schedule() const { return "0 * * *"; }
+  virtual std::string default_backup_schedule() const { return "0 * * * *"; }
 };
