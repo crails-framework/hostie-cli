@@ -9,6 +9,8 @@
 #include "restore_into_command.hpp"
 #include "upgrade.hpp"
 #include "plugin.hpp"
+#include "plugins_command.hpp"
+#include "search_command.hpp"
 
 class WordpressIndex : public Crails::CommandIndex
 {
@@ -25,5 +27,7 @@ public:
     add_command("restore", []() { return std::make_shared<Wordpress::RestoreCommand>(); });
     add_command("restore-into", []() { return std::make_shared<Wordpress::RestoreIntoCommand>(); });
     add_command("plugin", []() { return std::make_shared<Wordpress::PluginCommand>(); });
+    add_command("plugins", []() { return std::make_shared<Wordpress::PluginsCommand>(); });
+    add_command("search", []() { return std::make_shared<Wordpress::SearchCommand>(); });
   }
 };

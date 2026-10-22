@@ -10,6 +10,7 @@
 #include <crails/cli/filesystem.hpp>
 #include <crails/read_file.hpp>
 #include <crails/utils/split.hpp>
+#include "../../wordpress/sources.hpp"
 
 using namespace std;
 using namespace Wordpress;
@@ -103,9 +104,7 @@ static vector<string> wordpress_languages()
 
 filesystem::path find_wordpress_source(const string& version)
 {
-  if (std::getenv("WORDPRESS_DIRECTORY") != 0)
-    return filesystem::weakly_canonical(getenv("WORDPRESS_DIRECTORY")) / version;
-  return filesystem::path("/opt/hostie/wordpress-src") / version;
+  return Wordpress::source_root() / version;
 }
 
 bool Wizard::download_wordpress()

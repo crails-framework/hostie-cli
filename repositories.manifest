@@ -22,4 +22,10 @@ role: prerequisite
 location: https://github.com/crails-framework/libcrails-encrypt.git#master
 :
 role: prerequisite
+location: https://github.com/crails-framework/libcrails-semantics.git#master
+:
+role: prerequisite
+location: https://github.com/crails-framework/libdatatree.git#master
+:
+role: prerequisite
 location: https://github.com/crails-framework/crails-backup.git#master
