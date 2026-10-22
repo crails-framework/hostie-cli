@@ -14,6 +14,6 @@ public:
     add_command("list", []() { return std::make_shared<Html::ListCommand>(); });
     add_command("create", []() { return std::make_shared<CreateCommand>(); });
     add_command("remove", []() { return std::make_shared<RemoveCommand>(); });
-    add_command("desploy", []() { return std::make_shared<DeployCommand>(); });
+    add_command("deploy", []() { return std::make_shared<DeployCommand>(); });
   }
 };
