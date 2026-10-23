@@ -21,41 +21,26 @@ namespace Html
     {
       using namespace std;
       options.add_options()
-        ("package,p", boost::program_options::value<string>(), "absolute path of the tarball to extract");
+        ("package,p", boost::program_options::value<string>(), "absolute path of the tarball to extract")
+        ("sync,s", "synchronize directory by deleting files not present in the archive");
+    }
+
+    std::filesystem::path get_extraction_tmp_root() const
+    {
+      std::string directory = environment.get_variable("VAR_DIRECTORY");
+      return "/var/tmp/hostie-cli/" + directory;
     }
 
     int run() override
     {
-      using namespace std;
-      string user      = environment.get_variable("APPLICATION_USER");
-      string directory = environment.get_variable("VAR_DIRECTORY");
-      string group     = HostieVariables::global->variable("web-group");
-      string package   = options["package"].as<string>();
+      int status = protected_run();
 
-      if (filesystem::exists(package))
-      {
-        Crails::ExecutableCommand untar_command{"tar",   {}};
-        Crails::ExecutableCommand chown_command{"chown", {"-R", user + ':' + group, directory}};
-        Crails::ExecutableCommand chmod_file_command{"find", {directory, "-type", "f", "-exec", "chmod 640"}};
-        Crails::ExecutableCommand chmod_dirs_command{"find", {directory, "-type", "d", "-exec", "chmod 750"}};
-
-        cerr << "== " << untar_command << endl;
-        if (!Crails::run_command(untar_command))
-          return 2;
-        cerr << "== " << chown_command << endl;
-        if (!Crails::run_command(chown_command))
-          return 2;
-        cerr << "== " << chmod_file_command << endl;
-        if (!Crails::run_command(chmod_file_command))
-          return 2;
-        cerr << "== " << chmod_dirs_command << endl;
-        if (Crails::run_command(chmod_dirs_command))
-          return 2;
-        return 0;
-      }
-      else
-        cerr << "file `" << package << "` does not exist" << endl;
-      return 1;
+      std::filesystem::remove_all(get_extraction_tmp_root());
+      return status;
     }
+  protected:
+    int protected_run();
+    std::optional<Crails::ExecutableCommand> make_tarball_extract_command(std::string package, const std::filesystem::path& target_dir);
+    std::optional<std::string> extract_tarball_from_7z(std::filesystem::path package_path);
   };
 }
