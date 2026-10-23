@@ -1,6 +1,6 @@
 #include "plugin_package.hpp"
 #include "plugin_header.hpp"
-#include "program.hpp"
+#include <crails/cli/process.hpp>
 #include "temporary_directory.hpp"
 #include <grp.h>
 #include <pwd.h>
@@ -139,7 +139,7 @@ namespace
     fs::create_directory(extracted, error);
     if (error)
       return failure(PackageResult::InstallFailed, "could not create " + extracted.string());
-    if (run_program({"unzip", "-q", "-o", zip.string(), "-d", extracted.string()}) != 0)
+    if (!Crails::run_command({"unzip", {"-q", "-o", zip.string(), "-d", extracted.string()}}))
       return failure(PackageResult::InvalidPackage, "could not extract the archive");
     if (!is_plain_tree(extracted, problem))
       return failure(PackageResult::InvalidPackage, problem);
@@ -197,11 +197,11 @@ PackageResult Wordpress::download_and_install_plugin(const string& url, bool all
     return failure(PackageResult::InstallFailed, "could not create a temporary directory in " + target.parent_path().string());
   if (!starts_with(url, "https://") && !(allow_http && starts_with(url, "http://")))
     return failure(PackageResult::DownloadFailed, "unsupported URL (https is required)");
-  if (run_program({
-        "curl", "--fail", "--silent", "--show-error", "--location", "--globoff",
+  if (!Crails::run_command({"curl", {
+        "--fail", "--silent", "--show-error", "--location", "--globoff",
         "--max-time", "180", "--proto", protocols, "--proto-redir", protocols,
         "--user-agent", "hostie-cli", "--output", zip.string(), url
-      }) != 0)
+      }}))
     return failure(PackageResult::DownloadFailed, "could not download " + url);
   return install_from_zip(zip, target, owner, group, work);
 }

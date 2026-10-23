@@ -2,6 +2,7 @@
 #include "../user.hpp"
 #include "../hostie_variables.hpp"
 #include "../file_ownership.hpp"
+#include "plugin_scan.hpp"
 #include <iostream>
 #include <vector>
 
@@ -29,19 +30,49 @@ void FolderInstaller::create_directories(const filesystem::path& path) const
     filesystem::create_directories(path);
 }
 
+// Installing and uninstalling can be interrupted, and run again (a failed
+// upgrade is rolled back with them): installing what is already there is not
+// an error, and uninstalling removes the links this installer makes, and only
+// those. What an administrator put in the instance's directories is left alone
+// (a plugin with the same name as a global one, for instance).
 void FolderInstaller::create_directory_symlink(const filesystem::path& source, const filesystem::path& target) const
 {
+  error_code error;
+  const filesystem::file_status status = filesystem::symlink_status(target, error);
+
   if (action == Install)
+  {
+    if (filesystem::is_symlink(status))
+      filesystem::remove(target); // leads to another version, or nowhere
+    else if (status.type() != filesystem::file_type::not_found)
+      return ;
     filesystem::create_directory_symlink(source, target);
-  else
+  }
+  else if (filesystem::is_symlink(status) && Wordpress::is_inside(filesystem::read_symlink(target, error), wordpress_source))
     filesystem::remove(target);
 }
 
 void FolderInstaller::create_hard_link(const filesystem::path& source, const filesystem::path& target) const
 {
+  error_code error;
+  const filesystem::file_status status = filesystem::symlink_status(target, error);
+  const bool exists = status.type() != filesystem::file_type::not_found;
+  const bool same_file = exists && filesystem::equivalent(source, target, error);
+
   if (action == Install)
+  {
+    if (same_file)
+      return ;
+    if (exists)
+    {
+      // A hard link of a file of another version is ours to replace. Anything else is not.
+      if (!filesystem::is_regular_file(status) || filesystem::hard_link_count(target, error) < 2)
+        return ;
+      filesystem::remove(target);
+    }
     filesystem::create_hard_link(source, target);
-  else
+  }
+  else if (same_file)
     filesystem::remove(target);
 }
 

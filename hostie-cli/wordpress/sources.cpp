@@ -13,6 +13,33 @@ filesystem::path Wordpress::source_root()
   return filesystem::path("/opt/hostie/wordpress-src");
 }
 
+bool Wordpress::is_wordpress_version(const string& value)
+{
+  size_t dots = 0;
+
+  if (value.empty() || value.size() > 16 || value.front() == '.' || value.back() == '.')
+    return false;
+  for (size_t i = 0 ; i < value.size() ; ++i)
+  {
+    if (value[i] == '.')
+    {
+      if (value[i - 1] == '.')
+        return false;
+      ++dots;
+    }
+    else if (value[i] < '0' || value[i] > '9')
+      return false;
+  }
+  return dots == 1 || dots == 2;
+}
+
+bool Wordpress::is_complete_source(const filesystem::path& source)
+{
+  error_code error;
+
+  return filesystem::is_directory(source / "wp-includes", error) && filesystem::exists(source / "wp-config.php", error);
+}
+
 vector<string> Wordpress::installed_versions(const filesystem::path& root)
 {
   vector<string> versions;

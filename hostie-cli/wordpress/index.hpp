@@ -11,6 +11,7 @@
 #include "plugin.hpp"
 #include "plugins_command.hpp"
 #include "search_command.hpp"
+#include "source_command.hpp"
 
 class WordpressIndex : public Crails::CommandIndex
 {
@@ -29,5 +30,6 @@ public:
     add_command("plugin", []() { return std::make_shared<Wordpress::PluginCommand>(); });
     add_command("plugins", []() { return std::make_shared<Wordpress::PluginsCommand>(); });
     add_command("search", []() { return std::make_shared<Wordpress::SearchCommand>(); });
+    add_command("source", []() { return std::make_shared<Wordpress::SourceCommand>(); });
   }
 };
