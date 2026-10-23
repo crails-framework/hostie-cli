@@ -1,17 +1,12 @@
 #pragma once
-#include "../live_instance_command.hpp"
+#include "live_instance_command.hpp"
 #include <crails/cli/process.hpp>
 
 namespace Html
 {
-  class DeployCommand : public LiveInstanceCommand
+  class DeployCommand : public Html::LiveInstanceCommand
   {
   public:
-    std::string_view application_type() const override
-    {
-      return "HTML";
-    }
-
     std::string_view description() const override
     {
       return "deploys a tar archive as the HTML site";
